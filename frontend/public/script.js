@@ -1,4 +1,4 @@
-(function () {const BASE_URL = 'http://localhost:5000/api'; // adjust if hosted elsewhere
+(function () {const BASE_URL = 'http://localhost:5000/api';
 
 // ====== DOM ELEMENTS ======
 const loginPage = document.getElementById('login-page');

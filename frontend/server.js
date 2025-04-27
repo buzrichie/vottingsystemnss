@@ -64,7 +64,7 @@ app.get('/', (req, res) => {
     }
 
     // Replace placeholder __NONCE__ with actual nonce
-    const finalHtml = data.replace(/__NONCE__/g, res.locals.nonce);
+    const finalHtml = data.replace(/__NONCE__/g, res.locals.nonce).replace(/__BACKURI__/g, process.env.BASE_URI);;
 
     res.setHeader('Content-Security-Policy', `script-src 'self' 'nonce-${res.locals.nonce}'`);
     res.send(finalHtml);
