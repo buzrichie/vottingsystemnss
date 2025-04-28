@@ -47,8 +47,7 @@ router.post('/submit', authMiddleware, async (req, res) => {
 
         if (operations.length > 0) {
             const result = await Vote.bulkWrite(operations);
-            console.log('Bulk write result:', result);
-
+            
             // Update the voter's hasVoted status
             voter.hasVoted = true;
             await voter.save();

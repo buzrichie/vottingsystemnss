@@ -1,13 +1,11 @@
 require('dotenv').config();
 const XLSX = require('xlsx');
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const voteRoutes = require('./routes/vote');
 const bcrypt = require('bcryptjs');
 const adminRoutes = require('./routes/admin');
-const Voter = require('./models/Voter');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const Admin = require('./models/Admin');
@@ -15,7 +13,9 @@ const setDeviceIdCookie = require('./utils/setDeviceIdCookie ');
 
 const app = express();
 app.set('trust proxy', true);
-const corsOptions = {origin: "https://nss-election.netlify.app",  credentials: true,  
+
+const baseURL = process.env.NODE_ENV==="production" ? process.env.BASE_URL : process.env.LOCAL_BASE_URL;
+const corsOptions = {origin: baseURL,  credentials: true,  
   optionsSuccessStatus: 200  }
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -101,7 +101,9 @@ app.use(setDeviceIdCookie);
 app.use((req, res, next)=>{
   console.log('Requested path:', req.method);
   console.log('Requested path:', req.url);
-//   console.log('Requested body:', req.body);
+  if( process.env.NODE_ENV!=="production" ){
+  console.log('Requested body:', req.body);
+  }
   next()
 })
 
