@@ -1,4 +1,4 @@
-const votingStartTime = new Date('2025-04-30T08:00:00.000Z');
+// const votingEndTime = new Date('2025-04-30T08:00:00.000Z');
 const votingEndTime = new Date('2025-04-30T17:30:00.000Z');
 
 // Save the client load time
@@ -6,7 +6,8 @@ const clientLoadTime = Date.now();
 
 async function fetchServerTime() {
     try {
-      const res = await fetch('http://localhost:5000/api/server-time');
+        const BASE_URL = 'https://nss-election.onrender.com/api';
+      const res = await fetch(BASE_URL);
       const data = await res.json();
       return new Date(data.serverTime);
     } catch (error) {
@@ -30,7 +31,7 @@ export function startElectionCountdown(serverTime) {
     const now = new Date(serverTime.getTime() + (Date.now() - clientLoadTime));
 
     
-      const diff = votingStartTime - now;
+      const diff = votingEndTime - now;
           displayCountdown(diff, "Election ends in:");
     
   }, 1000);
