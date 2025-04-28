@@ -1,4 +1,4 @@
-(function () {const BASE_URL = 'https://nss-election.onrender.com';
+(function () {const BASE_URL = 'https://nss-election.onrender.com/api';
 
 // ====== DOM ELEMENTS ======
 const loginPage = document.getElementById('login-page');
