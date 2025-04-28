@@ -13,6 +13,29 @@
       <!-- Login Page -->
 <div id="login-page">
     <h2>NSS ELECTION</h2>
+    <div id="countdown-container">
+      <h2 id="countdown-label" >Election Countdown</h2>
+      
+      <div id="countdown-timer">
+        <div>
+          <div id="days">00</div>
+          <small>Days</small>
+        </div>
+        <div>
+          <div id="hours">00</div>
+          <small>Hours</small>
+        </div>
+        <div>
+          <div id="minutes">00</div>
+          <small>Minutes</small>
+        </div>
+        <div>
+          <div id="seconds">00</div>
+          <small>Seconds</small>
+        </div>
+      </div>
+    </div>
+    
     <input type="text" id="nss-number" placeholder="Enter NSS Number" />
     <button id="login-btn">Proceed To Vote</button>
     <p id="login-message"></p>
@@ -63,6 +86,7 @@
   </div>
 
 
+  <script nonce="__NONCE__" type="module" src="startElectionCountdown.js"></script>
   <script nonce="__NONCE__" type="module" src="script.js"></script>
 </body>
 </html>

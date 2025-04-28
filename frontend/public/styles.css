@@ -36,7 +36,6 @@ body {
   padding: 20px 10px;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  width: 100%;
 }
 
 #voting-pages {
@@ -376,6 +375,45 @@ input[type="radio"] {
   object-fit: cover;
   border: 2px solid var(--primary-color);
 }
+
+/* Countdown */
+#countdown-container{
+  padding-bottom: 1rem;
+}
+#countdown-container h2#countdown-label {
+  font-size: 1.25rem;
+  color: #555;
+}
+
+#countdown-timer {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+#countdown-timer > div {
+  text-align: center;
+  color: #333;
+}
+
+#countdown-timer small {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: #777;
+}
+
+/* Progress bar */
+#progress-bar-container {
+  margin-top: 35px;
+  height: 12px;
+  background-color: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
 
 @media screen and (max-width: 524px) {
   #login-page, #thank-you, #voting-pages {
