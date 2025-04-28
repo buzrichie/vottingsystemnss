@@ -15,56 +15,11 @@ const closeAdminBtn = document.getElementById("close-admin-btn")
 // const skipWarning = document.getElementById("skip-warning")
 
 let currentPage = 0;
-let currentUser = '';
 let votes = {};
 let token = '';
 let data = null;
 let adminToken = ""
-
-// ====== DATABASE SIMULATION ======
-// const validNSSNumbers = ['1234567890', '0987654321', '1122334455'];
-
-const votingData = [
-  {
-    position: 'President',
-    candidates: [
-      { name: 'BENJAMIN NII LOMOETEH BOTCHWAY', title: 'Mr.', image: './image/Benjamin.jpeg' },
-      { name: 'PRINCE ATTA-BRUCE', title: 'Mr.', image: './image/Bruce.jpeg' }
-    ]
-  },
-  {
-    position: 'Vice President',
-    candidates: [
-      { name: 'ROCKSON SAMUEL THEOPHILUS', title: 'Mr.', image: './image/Rockson.jpg' },
-
-    ]
-  },
-  {
-    position: 'General Secretary',
-    candidates: [
-      { name: 'THEODORA BAIDOO', title: 'Ms.', image: './image/Theodora.jpeg' },
-    ]
-  },
-  {
-    position: 'Financial Secretary',
-    candidates: [
-      { name: 'EMMANUELLA MENSAH', title: 'Ms.', image: './image/Emmanuella.jpg' },
-    ]
-  },
-  {
-    position: 'Organizer',
-    candidates: [
-      { name: 'BLESSING BAA-MINTAH', title: 'Ms.', image: './image/BLESSING.jpeg' },
-    ]
-  },
-  {
-    position: 'WOCOM',
-    candidates: [
-      { name: 'SARAH TABI AFRIYIE', title: 'Ms.', image: './image/Serah.jpg' },
-    ]
-  },
- 
-];
+let votingData = []
 
 loginBtn?.addEventListener('click', async () => {
   const nssNumber = document.getElementById('nss-number').value.trim();
@@ -82,8 +37,7 @@ loginBtn?.addEventListener('click', async () => {
     if (!res.ok) throw new Error(data.message || 'Login failed');
     
     token = data.token;
-    
-    currentUser = nssNumber;
+    votingData = data.candidates
     loginPage.style.display = 'none';
     votingPages.style.display = 'block';
     currentPage = 0;
