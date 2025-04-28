@@ -1,5 +1,5 @@
-const votingStartTime = new Date('2025-04-28T08:00:00.000Z');
-const votingEndTime = new Date('2025-04-28T17:30:00.000Z');
+const votingStartTime = new Date('2025-04-30T08:00:00.000Z');
+const votingEndTime = new Date('2025-04-30T17:30:00.000Z');
 
 // Save the client load time
 const clientLoadTime = Date.now();
