@@ -108,3 +108,10 @@ app.use((req, res, next)=>{
 app.use('/api/auth', authRoutes);
 app.use('/api/vote', voteRoutes);
 app.use('/api/admin', adminRoutes);
+app.get('/', (req, res) => {
+    res.status(201).json({
+    message: 'Welcome',
+    path: req.originalUrl,
+    });
+  });
+  
