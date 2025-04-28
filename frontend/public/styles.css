@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #3498db;
+  --primary-color: #2ebf2e;
   --secondary-color: #f5f7fa;
 
   --accent-dark: #2c3e50;
@@ -13,10 +13,12 @@
   --border-color: #dfe6e9;
 
   --text-color: #2c3e50;
-  --text-muted: #7f8c8d;
+  --text-muted: #7f8d88;
 
   --btn-primary: #3498db;
-  --btn-primary-hover: #2980b9;
+  --btn-primary: #0f8f0f;
+  /* --btn-primary-hover: #2980b9; */
+  --btn-primary-hover: #15c015;
   --btn-danger: #e74c3c;
   --btn-danger-hover: #c0392b;
 }

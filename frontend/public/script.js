@@ -271,14 +271,14 @@ function renderResults(results, stats) {
     const title = document.createElement('h2');
     title.textContent = capitalizeWords(position);
     section.appendChild(title);
-
+    results[position].candidates.sort((x, y) => y.votes - x.votes);
     results[position].candidates.forEach(candidate => {
       const box = document.createElement('div');
       box.classList.add("candidate-box")
       box.innerHTML = `
       <span class="candidate-s">
       <p><strong>${candidate.name}</strong></p>
-      <span>${candidate.votes} vote(s)</span>
+      <span>${candidate.votes} ${(candidate.votes>0)?"votes":"vote"}</span>
       </span>
       <span class="candidate-img">
     <img width="100%" height="100%"
