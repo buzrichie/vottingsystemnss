@@ -3,12 +3,12 @@ exports.validateVotingTime = (req, res, next) => {
     const endTime = new Date(process.env.VOTING_END);
     const currentTime = new Date();
   
-    console.log('Start Time (UTC):', startTime.toISOString());
-    console.log('End Time (UTC):', endTime.toISOString());
-    console.log('Current Time (UTC):', currentTime.toISOString());
-    console.log('StartTime ms:', startTime.getTime());
-    console.log('EndTime ms:', endTime.getTime());
-    console.log('CurrentTime ms:', currentTime.getTime());
+    // console.log('Start Time (UTC):', startTime.toISOString());
+    // console.log('End Time (UTC):', endTime.toISOString());
+    // console.log('Current Time (UTC):', currentTime.toISOString());
+    // console.log('StartTime ms:', startTime.getTime());
+    // console.log('EndTime ms:', endTime.getTime());
+    // console.log('CurrentTime ms:', currentTime.getTime());
   
     if (currentTime.getTime() < startTime.getTime()) {
       return res.status(403).json({
@@ -24,7 +24,6 @@ exports.validateVotingTime = (req, res, next) => {
       });
     }
   
-    console.log("Voting allowed: inside voting period.");
     next();
   };
   
