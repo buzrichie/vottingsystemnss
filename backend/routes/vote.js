@@ -3,6 +3,7 @@ const router = express.Router();
 const Vote = require('../models/Vote');
 const Voter = require('../models/Voter');
 const { authMiddleware } = require('../middleware/auth');
+const { validateVotingTime } = require('../middleware/validateVotingTime');
 
 const validPositions = [
   "president",
@@ -14,7 +15,8 @@ const validPositions = [
 ];
 
 
-router.post('/submit', authMiddleware, async (req, res) => {
+router.post('/submit', authMiddleware, validateVotingTime, async (req, res) => {
+
     if(req.user.role.toLowerCase() === 'admin') return res.status(403).json({ message: 'Admin isnt allowed to vote.' });
     const { votes } = req.body;
 
