@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 // Apply CORS settings
 app.use(cors({
-  origin: 'http://localhost:5000', // ✅ your frontend address (adjust if needed)
+  origin: 'https://nss-election.onrender.com',
   credentials: true,
 }));
 
@@ -28,7 +28,7 @@ app.use(
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      connectSrc: ["'self'", "http://localhost:5000"],
+      connectSrc: ["'self'", "https://nss-election.onrender.com"],
       styleSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
       scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
     },
