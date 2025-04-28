@@ -9,11 +9,10 @@ const setDeviceIdCookie = (req, res, next) => {
 
     // Set the cookie in the response with options
     res.cookie('deviceId', deviceId, {
-        maxAge: 3 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-        sameSite: "Strict",
-        
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV,
+      sameSite: process.env.NODE_ENV ? 'None' : 'Lax'
     });
       
   }
