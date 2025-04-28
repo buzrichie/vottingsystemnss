@@ -101,7 +101,7 @@ app.use(setDeviceIdCookie);
 app.use((req, res, next)=>{
   console.log('Requested path:', req.method);
   console.log('Requested path:', req.url);
-  console.log('Requested body:', req.body);
+//   console.log('Requested body:', req.body);
   next()
 })
 

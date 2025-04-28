@@ -1,0 +1,40 @@
+[
+    {
+      "position": "President",
+      "candidates": [
+        { "name": "BENJAMIN NII LOMOETEH BOTCHWAY", "title": "Mr." },
+        { "name": "PRINCE ATTA-BRUCE", "title": "Mr." }
+      ]
+    },
+    {
+      "position": "Vice President",
+      "candidates": [
+        { "name": "ROCKSON SAMUEL THEOPHILUS", "title": "Mr." }
+      ]
+    },
+    {
+      "position": "General Secretary",
+      "candidates": [
+        { "name": "THEODORA BAIDOO", "title": "Ms." }
+      ]
+    },
+    {
+      "position": "Financial Secretary",
+      "candidates": [
+        { "name": "EMMANUELLA MENSAH", "title": "Ms." }
+      ]
+    },
+    {
+      "position": "Organizer",
+      "candidates": [
+        { "name": "BLESSING BAA-MINTAH", "title": "Ms." }
+      ]
+    },
+    {
+      "position": "WOCOM",
+      "candidates": [
+        { "name": "SARAH TABI AFRIYIE", "title": "Ms." }
+      ]
+    }
+  ]
+  
