@@ -1,4 +1,5 @@
-(function () {const BASE_URL = 'https://nss-election.onrender.com/api';
+(function () {
+  const BASE_URL = 'https://nss-election.onrender.com/api';
 
 // ====== DOM ELEMENTS ======
 const loginPage = document.getElementById('login-page');
@@ -8,7 +9,7 @@ const adminPanel = document.getElementById('admin-panel');
 const resultsContainer = document.getElementById('results-container');
 const statsContainer = document.getElementById('stats-container');
 const loginBtn = document.getElementById('login-btn');
-const adminAccessBtn = document.getElementById('admin-access-btn');
+// const adminAccessBtn = document.getElementById('admin-access-btn');
 const loginMessage = document.getElementById('login-message');
 const spinner = document.getElementById("spinner");
 const closeAdminBtn = document.getElementById("close-admin-btn")
@@ -44,6 +45,7 @@ loginBtn?.addEventListener('click', async () => {
     votingPages.style.display = 'block';
     currentPage = 0;
     votes = {};
+    
     showVotingPage();
   } catch (err) {
     loginMessage.textContent = err.message;
@@ -61,6 +63,7 @@ function toggleSpinner(value) {
 }
 
 function showVotingPage() {
+  if(!token) return
   votingPages.innerHTML = '';
   
   if (currentPage >= votingData.length) return;
@@ -201,7 +204,10 @@ async function submitVotes() {
     toggleSpinner(false)
   }
 }
-adminAccessBtn.addEventListener('click', showAdminPanel)
+// adminAccessBtn.addEventListener('click', ()=>{
+//     showAdminPanel()
+//     window.history.go({}, '', '/result');
+// })
 
 async function showAdminPanel() {
   try {
@@ -309,4 +315,12 @@ function capitalizeWords(str) {
     return word.charAt(0).toUpperCase() + word.slice(1);
   }).join(' ');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Check if the current route is "/result"
+  if (window.location.pathname === '/result') {
+    showAdminPanel();
+  }
+});
+
 })();

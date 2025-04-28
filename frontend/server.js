@@ -15,10 +15,13 @@ app.use((req, res, next) => {
   res.locals.nonce = nonce;
   next();
 });
+const baseURL = process.env.NODE_ENV==="production" ? process.env.BASE_URI : process.env.LOCAL_BASE_URI;
+
+console.log(baseURL);
 
 // Apply CORS settings
 app.use(cors({
-  origin: 'https://nss-election.onrender.com',
+  origin: baseURL,
   credentials: true,
 }));
 
@@ -28,7 +31,7 @@ app.use(
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      connectSrc: ["'self'", "https://nss-election.onrender.com"],
+      connectSrc: ["'self'", baseURL],
       styleSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
       scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
     },
@@ -64,7 +67,7 @@ app.get('/', (req, res) => {
     }
 
     // Replace placeholder __NONCE__ with actual nonce
-    const finalHtml = data.replace(/__NONCE__/g, res.locals.nonce).replace(/__BACKURI__/g, process.env.BASE_URI);;
+    const finalHtml = data.replace(/__NONCE__/g, res.locals.nonce);
 
     res.setHeader('Content-Security-Policy', `script-src 'self' 'nonce-${res.locals.nonce}'`);
     res.send(finalHtml);
@@ -73,6 +76,10 @@ app.get('/', (req, res) => {
 
 // Serve static files like images, styles
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/*index', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
