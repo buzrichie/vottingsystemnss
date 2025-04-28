@@ -12,7 +12,7 @@ const setDeviceIdCookie = (req, res, next) => {
         maxAge: 3 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         secure: true,
-        sameSite: "None",
+        sameSite: "Strict",
         
     });
       

@@ -15,7 +15,7 @@ const setDeviceIdCookie = require('./utils/setDeviceIdCookie ');
 
 const app = express();
 app.set('trust proxy', true);
-const corsOptions = {origin: ["http://127.0.0.1:5500", "http://localhost:5500","http://127.0.0.1:5000"],  credentials: true,  
+const corsOptions = {origin: "https://nss-election.netlify.app",  credentials: true,  
   optionsSuccessStatus: 200  }
 app.use(cors(corsOptions));
 app.use(express.json());
