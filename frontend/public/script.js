@@ -23,7 +23,9 @@ let votingData = []
 
 loginBtn?.addEventListener('click', async () => {
   const nssNumber = document.getElementById('nss-number').value.trim();
-
+  if (!nssNumber) {
+    return alert("Please Enter NSS NUMBER to proceed voting.");
+  }
   try {
     toggleSpinner(true)
     const res = await fetch(`${BASE_URL}/auth/login`, {
@@ -205,6 +207,9 @@ async function showAdminPanel() {
   try {
     if (!adminToken) {
     const password = prompt("Enter admin password:");
+    if (!password || password.trim() === "") {
+      return;
+    }
     toggleSpinner(true)
     const res = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
