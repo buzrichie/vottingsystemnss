@@ -64,24 +64,18 @@ function addVote(candidates, candidateName) {
 }
 
 
-router.post('/login',customRateLimiter, async (req, res) => {
+router.post('/admin/login',customRateLimiter, async (req, res) => {
   try {
-    // const validNSSNumbers = ['1234567890', '0987654321', '1122334455'];
-    const { nssNumber, password } = req.body;
+    const { password } = req.body;
 
-  let user;
-  if(nssNumber){
-       user = await Voter.findOne({ nssNumber });
+  if (!password){
+    return res.status(401).json({ message: 'Password is requied' });
   }
-  if (password){
-     user = await Admin.findOne({role:"admin" });
-  }
-  if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-  
-
-  // Admin login
+  user = await Admin.findOne({role:"admin" });
+   if (!user) {
+     return res.status(401).json({ message: 'Invalid credentials' });
+   }
+   // Admin login
   if (user && user.role.toLowerCase() === 'admin') {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
@@ -98,7 +92,22 @@ router.post('/login',customRateLimiter, async (req, res) => {
     return res.json({ token, role: 'admin', results });
   }  
 
-  if (!nssNumber) return res.status(401).json({ message: 'No NSS number provided' });
+  }catch(e){
+    console.error(e.message)
+    return res.status(500).json({ message: 'Internal Server Error.' , error});
+  }
+})
+
+router.post('/login', customRateLimiter, async (req, res) => {
+  try {
+    const { nssNumber } = req.body;
+    if (!nssNumber) return res.status(401).json({ message: 'No NSS number provided' });
+  
+    const user = await Voter.findOne({ nssNumber });
+  
+  if (!user) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
 
   if (user.hasVoted) {
     return res.status(403).json({ message: 'Already voted.' });
@@ -115,7 +124,8 @@ router.post('/login',customRateLimiter, async (req, res) => {
 
   res.json({ token, role: 'voter' , candidates});
 } catch (error) {
-    console.error(error)
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error.' , error});
 }
 });
 
