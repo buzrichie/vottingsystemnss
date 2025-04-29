@@ -17,8 +17,6 @@ app.use((req, res, next) => {
 });
 const baseURL = process.env.NODE_ENV==="production" ? process.env.BASE_URI : process.env.LOCAL_BASE_URI;
 
-console.log(baseURL);
-
 // Apply CORS settings
 app.use(cors({
   origin: baseURL,
@@ -56,6 +54,8 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files like images, styles
+app.use(express.static(path.join(__dirname, 'public')));
 // Serve frontend with nonce replacement
 app.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, 'public', 'index.html');
@@ -74,8 +74,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Serve static files like images, styles
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.get('/*index', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

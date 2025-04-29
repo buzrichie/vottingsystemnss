@@ -22,6 +22,29 @@ let data = null;
 let adminToken = ""
 let votingData = []
 
+if (!window.history.state) {
+  // history.pushState({}, '', "/");
+  console.log("used");
+  
+  window.history.replaceState({}, '', window.location.pathname);
+}
+
+window.addEventListener('popstate', ()=>{
+  console.log(window.history.length);
+  
+  if (window.location.pathname === '/') {
+    loginPage.style.display = 'block';
+    votingPages.style.display = 'none';
+  }
+  if (window.location.pathname === '/vote') {
+    showVotingPage();
+  }
+  if (window.location.pathname === '/result') {
+    showAdminPanel();
+  }
+}
+);
+
 loginBtn?.addEventListener('click', async () => {
   const nssNumber = document.getElementById('nss-number').value.trim();
   if (!nssNumber) {
@@ -41,8 +64,7 @@ loginBtn?.addEventListener('click', async () => {
     
     token = data.token;
     votingData = data.candidates
-    loginPage.style.display = 'none';
-    votingPages.style.display = 'block';
+    
     currentPage = 0;
     votes = {};
     
@@ -63,7 +85,14 @@ function toggleSpinner(value) {
 }
 
 function showVotingPage() {
-  if(!token) return
+  console.log("invoked");
+  
+  if(!token) {
+    window.history.replaceState({}, '', '/')
+    return}
+  history.pushState({}, '', "/vote");
+  loginPage.style.display = 'none';
+  votingPages.style.display = 'block';
   votingPages.innerHTML = '';
   
   if (currentPage >= votingData.length) return;
@@ -108,10 +137,11 @@ function showVotingPage() {
     box.appendChild(img);
     box.appendChild(infoBox);
     box.appendChild(radio);
+    box.addEventListener('click',()=>{selectCandidate(box)});
     candidateRow.appendChild(box);
   });
   
-  // 🆕 ADD this after the loop to handle unopposed positions
+  // ADD this after the loop to handle unopposed positions
   if (data.candidates.length === 1) {
     const noneBox = document.createElement('div');
     noneBox.className = 'candidate';
@@ -134,6 +164,7 @@ function showVotingPage() {
     noneBox.appendChild(noneImg);
     noneBox.appendChild(noneInfoBox);
     noneBox.appendChild(noneRadio);
+    noneBox.addEventListener('click',()=>{selectCandidate(noneBox)});
     candidateRow.appendChild(noneBox);
   }
   
@@ -158,6 +189,20 @@ function showVotingPage() {
   votingPages.appendChild(nextBtn);
 }
 
+function selectCandidate(box) {
+  const radio = box.querySelector('input[type="radio"]');
+  if (radio) {
+    radio.checked = true;
+
+    // Remove `.selected` from all siblings
+    const allCards = document.querySelectorAll('.candidate');
+    allCards.forEach(c => c.classList.remove('selected'));
+
+    // Add `.selected` to clicked card
+    box.classList.add('selected');
+  }
+}
+
 function skipOrNextVotin() {
   currentPage++;
 
@@ -168,6 +213,14 @@ function skipOrNextVotin() {
   }  
 
 }
+
+document.querySelectorAll('.candidate').forEach((x)=>{
+  console.log(x);
+  
+})
+ 
+
+
 
 document.getElementById("confirm-skip").addEventListener("click",  confirmSkip);
 document.getElementById("cancel-skip").addEventListener("click", cancelSkip)
@@ -184,6 +237,9 @@ function cancelSkip() {
 
 async function submitVotes() {
   try {
+    if (!token) {
+      return
+    }
     toggleSpinner(true)
     const res = await fetch(`${BASE_URL}/vote/submit`, {
       method: 'POST',
@@ -245,6 +301,7 @@ async function showAdminPanel() {
 };
 
 function renderResults(results, stats) {
+  history.pushState({}, '', "/result");
   resultsContainer.innerHTML = '';
   statsContainer.innerHTML= ''
   // Create stats summary first
@@ -322,5 +379,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showAdminPanel();
   }
 });
+
 
 })();

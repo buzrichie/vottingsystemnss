@@ -206,7 +206,10 @@ button:hover {
   width: 100%;
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.05);
 }
-
+.candidate.selected {
+  border-color: #007bff;
+  background-color: #e7f1ff;
+}
 .candidate img {
   width: 100px;
   height: 100px;
