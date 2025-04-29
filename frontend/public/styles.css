@@ -44,6 +44,28 @@ body {
   position: relative;
   display: none;
 }
+.nss-logo-wrapper{
+  max-width: 200px;
+  display: inline-block;
+}
+.p-heading{
+  margin-top: 0;
+  font-size: 1.5rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+ 
+}
+.p-heading .ph-red{
+  color: var(--danger-color);
+}
+
+.p-heading .ph-yellow{
+  color: var(--warning-color);
+}
+.p-heading .ph-green{
+  color: var(--primary-color);
+}
 
 .skip {
   background-color: var(--danger-color);

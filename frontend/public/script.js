@@ -23,15 +23,11 @@ let adminToken = ""
 let votingData = []
 
 if (!window.history.state) {
-  // history.pushState({}, '', "/");
-  console.log("used");
-  
+
   window.history.replaceState({}, '', window.location.pathname);
 }
 
 window.addEventListener('popstate', ()=>{
-  console.log(window.history.length);
-  
   if (window.location.pathname === '/') {
     loginPage.style.display = 'block';
     votingPages.style.display = 'none';
@@ -85,8 +81,6 @@ function toggleSpinner(value) {
 }
 
 function showVotingPage() {
-  console.log("invoked");
-  
   if(!token) {
     window.history.replaceState({}, '', '/')
     return}
@@ -214,14 +208,6 @@ function skipOrNextVotin() {
 
 }
 
-document.querySelectorAll('.candidate').forEach((x)=>{
-  console.log(x);
-  
-})
- 
-
-
-
 document.getElementById("confirm-skip").addEventListener("click",  confirmSkip);
 document.getElementById("cancel-skip").addEventListener("click", cancelSkip)
 function confirmSkip() {
@@ -273,7 +259,7 @@ async function showAdminPanel() {
       return;
     }
     toggleSpinner(true)
-    const res = await fetch(`${BASE_URL}/auth/login`, {
+    const res = await fetch(`${BASE_URL}/auth/admin/login`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
