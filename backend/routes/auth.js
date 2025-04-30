@@ -8,6 +8,7 @@ const Vote = require('../models/Vote');
 const customRateLimiter = require('../utils/customRateLimiter');
 const fs = require('fs');
 const path = require('path');
+const { validateVotingTime } = require('../middleware/validateVotingTime');
 
 
 async function analyzeVotes() {
@@ -98,7 +99,7 @@ router.post('/admin/login',customRateLimiter, async (req, res) => {
   }
 })
 
-router.post('/login', customRateLimiter, async (req, res) => {
+router.post('/login',validateVotingTime, customRateLimiter, async (req, res) => {
   try {
     const { nssNumber } = req.body;
     if (!nssNumber) return res.status(401).json({ message: 'No NSS number provided' });
