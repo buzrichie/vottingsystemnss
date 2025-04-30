@@ -39,7 +39,9 @@ export function startElectionCountdown(serverTime) {
         displayCountdown(diff, "Election ends in:");
       } else {
         clearInterval(timerInterval);
+        const loginBtn = document.getElementById('login-btn');
         const adminAccessWrapper = document.getElementById('admin-access');
+        loginBtn.style.display = "none"
         adminAccessWrapper.style.display = "block"
         displayCountdown(0, "Election has ended.");
       }
