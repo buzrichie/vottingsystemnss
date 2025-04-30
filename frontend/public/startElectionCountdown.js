@@ -6,8 +6,7 @@ const clientLoadTime = Date.now();
 
 async function fetchServerTime() {
     try {
-        // const BASE_URL = 'https://nss-election.onrender.com/api/server-time';
-        const BASE_URL = 'http://localhost:5000/api/server-time';
+        const BASE_URL = 'https://nss-election.onrender.com/api/server-time';
       const res = await fetch(BASE_URL);
       const data = await res.json();
       return new Date(data.serverTime);
