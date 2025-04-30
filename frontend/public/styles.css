@@ -279,8 +279,11 @@ input[type="radio"] {
 }
 #admin-access{
   text-align: center; margin-top: 20px;
+  display: none;
 }
-
+#admin-access-btn{
+  background-color: var(--warning-color);
+}
 #admin-panel h1 {
   text-align: center;
   color: var(--accent-dark);

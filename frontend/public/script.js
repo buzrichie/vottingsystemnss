@@ -9,7 +9,7 @@ const adminPanel = document.getElementById('admin-panel');
 const resultsContainer = document.getElementById('results-container');
 const statsContainer = document.getElementById('stats-container');
 const loginBtn = document.getElementById('login-btn');
-// const adminAccessBtn = document.getElementById('admin-access-btn');
+const adminAccessBtn = document.getElementById('admin-access-btn');
 const loginMessage = document.getElementById('login-message');
 const spinner = document.getElementById("spinner");
 const closeAdminBtn = document.getElementById("close-admin-btn")
@@ -246,10 +246,48 @@ async function submitVotes() {
     toggleSpinner(false)
   }
 }
-// adminAccessBtn.addEventListener('click', ()=>{
-//     showAdminPanel()
-//     window.history.go({}, '', '/result');
-// })
+adminAccessBtn.addEventListener('click',async ()=>{
+  try {
+    toggleSpinner(true)
+    
+    const serverTimef = await fetch(`${BASE_URL}/server-time`);
+    const serverTimefData = await serverTimef.json();
+    const serverTime = new Date(serverTimefData.serverTime);
+    if (!serverTime) {
+      throw new Error("'Error fetching time:'");
+
+    }
+
+    const votingEndTime = new Date('2025-04-30T16:00:00.000Z');
+    const clientLoadTime = Date.now();
+    const now = new Date(serverTime.getTime() + (Date.now() - clientLoadTime));
+    if (now < votingEndTime) {
+      throw new Error("Election has not ended. Please check back later.");
+    }
+    const res = await fetch(`${BASE_URL}/admin/public-results`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) throw new Error(res.message || 'Unauthorized access');
+
+     data = await res.json();
+  
+    const results = data.results.results;
+    const stats = data.results.stats;
+
+    loginPage.style.display = 'none';
+    votingPages.style.display = 'none';
+    thankYouPage.style.display = 'none';
+    adminPanel.style.display = 'block';
+    renderResults(results, stats);
+  } catch (err) {
+    loginMessage.textContent = err.message;
+  }finally{
+    toggleSpinner(false)
+  }
+})
 
 async function showAdminPanel() {
   try {
