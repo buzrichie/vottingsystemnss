@@ -1,3 +1,36 @@
+const fs = require('fs');
+const path = require('path');
+
+// File to store the analytics
+const analyticsFile = path.join(__dirname, 'rateLimiterAnalytics.json');
+
+const logAnalytics = (deviceId, attempts) => {
+  const logData = {
+    deviceId,
+    count: attempts.count,
+    lastAttempt: new Date(attempts.lastAttempt).toISOString(),
+    bannedUntil: attempts.bannedUntil ? new Date(attempts.bannedUntil).toISOString() : null,
+  };
+
+  // Read the existing data
+  let existingData = [];
+  if (fs.existsSync(analyticsFile)) {
+    try {
+      const raw = fs.readFileSync(analyticsFile);
+      existingData = JSON.parse(raw);
+    } catch (err) {
+      console.error('Failed to parse analytics file:', err);
+    }
+  }
+
+  // Add new entry (you may want to deduplicate later based on deviceId)
+  existingData.push(logData);
+
+  // Write updated analytics back to file
+  fs.writeFileSync(analyticsFile, JSON.stringify(existingData, null, 2));
+};
+
+
 const customRateLimiter = (req, res, next) => {
     // Get deviceId from cookies or IP if deviceId does not exist
     const deviceId = req.cookies["deviceId"] || req.ip;
@@ -52,6 +85,10 @@ const customRateLimiter = (req, res, next) => {
     // Store the updated attempts data
     global.ipAttempts[deviceId] = attempts;
     
+     // Log this interaction (exclude permanently blocked IPs)
+  if (attempts.count < 4) {
+    logAnalytics(deviceId, attempts);
+  }
   
     // Continue to the next middleware
     next();
