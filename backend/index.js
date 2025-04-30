@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const Admin = require('./models/Admin');
 const setDeviceIdCookie = require('./utils/setDeviceIdCookie ');
+const Voter = require('./models/Voter');
 
 const app = express();
 app.set('trust proxy', true);
