@@ -1,40 +1,42 @@
 [
-    {
-      "position": "President",
-      "candidates": [
-        { "name": "BENJAMIN NII LOMOETEH BOTCHWAY", "title": "Mr." },
-        { "name": "PRINCE ATTA-BRUCE", "title": "Mr." }
-      ]
-    },
-    {
-      "position": "Vice President",
-      "candidates": [
-        { "name": "ROCKSON SAMUEL THEOPHILUS", "title": "Mr." }
-      ]
-    },
-    {
-      "position": "General Secretary",
-      "candidates": [
-        { "name": "THEODORA BAIDOO", "title": "Ms." }
-      ]
-    },
-    {
-      "position": "Financial Secretary",
-      "candidates": [
-        { "name": "EMMANUELLA MENSAH", "title": "Ms." }
-      ]
-    },
-    {
-      "position": "Organizer",
-      "candidates": [
-        { "name": "BLESSING BAA-MINTAH", "title": "Ms." }
-      ]
-    },
-    {
-      "position": "WOCOM",
-      "candidates": [
-        { "name": "SARAH TABI AFRIYIE", "title": "Ms." }
-      ]
-    }
-  ]
-  
+  {
+    "position": "President",
+    "candidates": [
+      { "name": "Candidate 1", "title": "Mr." },
+      { "name": "Candidate 2", "title": "Mr." }
+    ]
+  },
+  {
+    "position": "Vice President",
+    "candidates": [
+      { "name": "Candidate 3", "title": "Mr." }
+    ]
+  },
+  {
+    "position": "General Secretary",
+    "candidates": [
+      { "name": "Candidate 4", "title": "Ms." }
+    ]
+  },
+  {
+    "position": "Financial Secretary",
+    "candidates": [
+      { "name": "Candidate 5", "title": "Ms." },
+      { "name": "Candidate 6", "title": "Ms." }
+    ]
+  },
+  {
+    "position": "Organizer",
+    "candidates": [
+      { "name": "Candidate 7", "title": "Mr." },
+      { "name": "Candidate 8", "title": "Ms." }
+    ]
+  },
+  {
+    "position": "WOCOM",
+    "candidates": [
+      { "name": "Candidate 9", "title": "Ms." },
+      { "name": "Candidate 10", "title": "Mr." }
+    ]
+  }
+]
