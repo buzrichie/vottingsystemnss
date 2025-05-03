@@ -22,6 +22,7 @@ function initializeSocket(httpServer) {
   // Apply middleware
   io.use(authenticateSocketJWT);
   const userSockets = new Map();
+console.log(" web socket working");
 
   io.on('connection', (socket) => {
     // Assuming authenticateSocketJWT attaches the user to the socket
