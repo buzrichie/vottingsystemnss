@@ -15,7 +15,7 @@ app.use((req, res, next) => {
   res.locals.nonce = nonce;
   next();
 });
-const baseURL = process.env.NODE_ENV==="production" ? process.env.BASE_URI : process.env.LOCAL_BASE_URI;
+const baseURL = process.env.NODE_ENV==="production" ? process.env.BACKEND_URI : process.env.LOCAL_BACKEND_URI;
 
 // Apply CORS settings
 app.use(cors({
@@ -57,6 +57,11 @@ app.use((req, res, next) => {
 // Serve static files like images, styles
 app.use(express.static(path.join(__dirname, 'public')));
 // Serve frontend with nonce replacement
+app.get('/config', (req, res) => {
+  // Send the baseUri and any other settings you want to expose
+  res.json({ baseUri:baseURL });
+});
+
 app.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, 'public', 'index.html');
 

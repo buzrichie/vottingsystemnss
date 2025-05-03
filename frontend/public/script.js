@@ -1,438 +1,443 @@
-(function () {
-  const BASE_URL = 'https://nss-election.onrender.com/api';
-  
-// ====== DOM ELEMENTS ======
-const loginPage = document.getElementById('login-page');
-const votingPages = document.getElementById('voting-pages');
-const thankYouPage = document.getElementById('thank-you');
-const adminPanel = document.getElementById('admin-panel');
-const resultsContainer = document.getElementById('results-container');
-const statsContainer = document.getElementById('stats-container');
-const loginBtn = document.getElementById('login-btn');
-const adminAccessBtn = document.getElementById('admin-access-btn');
-const loginMessage = document.getElementById('login-message');
-const spinner = document.getElementById("spinner");
-const closeAdminBtn = document.getElementById("close-admin-btn")
-// const skipWarning = document.getElementById("skip-warning")
+import { fetchConfig } from './config.js';
 
-let currentPage = 0;
-let votes = {};
-let voterCSRFToken = "";
+    
+  (async function () {  
+    const {data} = await fetchConfig()
+    const baseUri = `${data}/api`;
+    
+  // ====== DOM ELEMENTS ======
+  const loginPage = document.getElementById('login-page');
+  const votingPages = document.getElementById('voting-pages');
+  const thankYouPage = document.getElementById('thank-you');
+  const adminPanel = document.getElementById('admin-panel');
+  const resultsContainer = document.getElementById('results-container');
+  const statsContainer = document.getElementById('stats-container');
+  const loginBtn = document.getElementById('login-btn');
+  const adminAccessBtn = document.getElementById('admin-access-btn');
+  const loginMessage = document.getElementById('login-message');
+  const spinner = document.getElementById("spinner");
+  const closeAdminBtn = document.getElementById("close-admin-btn")
+  // const skipWarning = document.getElementById("skip-warning")
 
-let adminCSRFToken = ""
-let votingData = []
+  let currentPage = 0;
+  let votes = {};
+  let voterCSRFToken = "";
 
-if (!window.history.state) {
+  let adminCSRFToken = ""
+  let votingData = []
 
-  window.history.replaceState({}, '', window.location.pathname);
-}
+  if (!window.history.state) {
 
-window.addEventListener('popstate', ()=>{
-  if (window.location.pathname === '/') {
-    loginPage.style.display = 'block';
-    votingPages.style.display = 'none';
+    window.history.replaceState({}, '', window.location.pathname);
   }
-  if (window.location.pathname === '/vote') {
-    showVotingPage();
-  }
-  if (window.location.pathname === '/result') {
-    showAdminPanel();
-  }
-}
-);
 
-loginBtn?.addEventListener('click', async () => {
-  const nssNumber = document.getElementById('nss-number').value.trim();
-  if (!nssNumber) {
-    return alert("Please Enter NSS NUMBER to proceed voting.");
-  }
-  try {
-    toggleSpinner(true)
-    const csrfToken = await getCSRFToken()
-    if (!csrfToken) {
-      return 
+  window.addEventListener('popstate', ()=>{
+    if (window.location.pathname === '/') {
+      loginPage.style.display = 'block';
+      votingPages.style.display = 'none';
     }
-    const res = await fetch(`${BASE_URL}/auth/login`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json',
-        "x-csrf-token": csrfToken
-       },
-      body: JSON.stringify({ nssNumber }),
-    });
-    if (!res.ok) throw new Error(data.message || 'Login failed');
-    const data = await res.json();
-    
-    voterCSRFToken = data.csrfToken;
-    votingData = data.candidates
-    
-    currentPage = 0;
-    votes = {};
-    
-    showVotingPage();
-  } catch (err) {
-    loginMessage.textContent = err.message;
-  }finally{
-    toggleSpinner(false)
+    if (window.location.pathname === '/vote') {
+      showVotingPage();
+    }
+    if (window.location.pathname === '/result') {
+      showAdminPanel();
+    }
   }
-});
+  );
 
-function toggleSpinner(value) {
-  if (value===true) {
-    spinner.style.display = "flex"
-  } else {
-    spinner.style.display = "none"
-  }
-}
-
-function showVotingPage() {
-  if(!voterCSRFToken) {
-    window.history.replaceState({}, '', '/')
-    return}
-  history.pushState({}, '', "/vote");
-  loginPage.style.display = 'none';
-  votingPages.style.display = 'block';
-  votingPages.innerHTML = '';
-  
-  if (currentPage >= votingData.length) return;
-
-  const data = votingData[currentPage];
-  const title = document.createElement('h2');
-  title.textContent = data.position;
-  
-
-  votingPages.appendChild(title);
-  
-
-  const candidateRow = document.createElement('div');
-  candidateRow.className = 'candidate-row';
-  // const skipBtn = document.createElement('div');
-  // skipBtn.textContent = "Skip"
-  // skipBtn.classList.add("skip")
-  // votingPages.appendChild(skipBtn);
-
-  data.candidates.forEach(candidate => {
-    const box = document.createElement('div');
-    box.className = 'candidate';
-  
-    const img = document.createElement('img');
-    img.src = candidate.name
-      ? `./image/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
-      : './image/No.jpeg';
+  loginBtn?.addEventListener('click', async () => {
+    const nssNumber = document.getElementById('nss-number').value.trim();
+    if (!nssNumber) {
+      return alert("Please Enter NSS NUMBER to proceed voting.");
+    }
+    try {
+      toggleSpinner(true)
+      const csrfToken = await getCSRFToken()
+      if (!csrfToken) {
+        return 
+      }
+      const res = await fetch(`${baseUri}/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json',
+          "x-csrf-token": csrfToken
+        },
+        body: JSON.stringify({ nssNumber }),
+      });
+      if (!res.ok) throw new Error(data.message || 'Login failed');
+      const data = await res.json();
       
-    img.alt = candidate.name;
-  
-    const infoBox = document.createElement('div');
-    infoBox.innerHTML = `
-      <p><strong>${candidate.title} ${candidate.name.toUpperCase()}</strong></p>
-      <p>Candidate for ${data.position}</p>
-    `;
-  
-    const radio = document.createElement('input');
-    radio.type = 'radio';
-    radio.name = `vote-${currentPage}`;
-    radio.value = candidate.name.toUpperCase();
-  
-    box.appendChild(img);
-    box.appendChild(infoBox);
-    box.appendChild(radio);
-    box.addEventListener('click',()=>{selectCandidate(box)});
-    candidateRow.appendChild(box);
+      voterCSRFToken = data.csrfToken;
+      votingData = data.candidates
+      
+      currentPage = 0;
+      votes = {};
+      
+      showVotingPage();
+    } catch (err) {
+      loginMessage.textContent = err.message;
+    }finally{
+      toggleSpinner(false)
+    }
   });
-  
-  // ADD this after the loop to handle unopposed positions
-  if (data.candidates.length === 1) {
-    const noneBox = document.createElement('div');
-    noneBox.className = 'candidate';
-  
-    const noneImg = document.createElement('img');
-    noneImg.src = './image/No.jpeg';
-    noneImg.alt = 'None of the Above';
-  
-    const noneInfoBox = document.createElement('div');
-    noneInfoBox.innerHTML = `
-      <p><strong>NO</strong></p>
-      <p>Reject candidate for ${data.position}</p>
-    `;
-  
-    const noneRadio = document.createElement('input');
-    noneRadio.type = 'radio';
-    noneRadio.name = `vote-${currentPage}`;
-    noneRadio.value = 'NO';
-  
-    noneBox.appendChild(noneImg);
-    noneBox.appendChild(noneInfoBox);
-    noneBox.appendChild(noneRadio);
-    noneBox.addEventListener('click',()=>{selectCandidate(noneBox)});
-    candidateRow.appendChild(noneBox);
-  }
-  
-  votingPages.appendChild(candidateRow);
 
-  const nextBtn = document.createElement('button');
-  nextBtn.classList.add("next")
-  nextBtn.textContent = currentPage === votingData.length - 1 ? 'Submit' : 'Next';
-  nextBtn.addEventListener('click', () => {
-    const selected = document.querySelector(`input[name="vote-${currentPage}"]:checked`);
-    if (!selected) return alert("Please select a candidate.");
-
-    votes[data.position] = selected.value;
-    skipOrNextVotin(); 
-  });
-  // skipBtn.addEventListener("click",()=>{
-  //   skipWarning.style.display = "block"
-  //   document.getElementById('modal-background').style.display = 'block';
-  //   document.getElementById('modal-background').style.display = 'block';
-  // });
-  
-  votingPages.appendChild(nextBtn);
-}
-
-function selectCandidate(box) {
-  const radio = box.querySelector('input[type="radio"]');
-  if (radio) {
-    radio.checked = true;
-
-    // Remove `.selected` from all siblings
-    const allCards = document.querySelectorAll('.candidate');
-    allCards.forEach(c => c.classList.remove('selected'));
-
-    // Add `.selected` to clicked card
-    box.classList.add('selected');
-  }
-}
-
-function skipOrNextVotin() {
-  currentPage++;
-
-  if (currentPage < votingData.length) {
-    showVotingPage();
-  } else {
-    submitVotes();
-  }  
-
-}
-
-document.getElementById("confirm-skip").addEventListener("click",  confirmSkip);
-document.getElementById("cancel-skip").addEventListener("click", cancelSkip)
-function confirmSkip() {
-  skipOrNextVotin()
-  document.getElementById('modal-background').style.display = 'none';
-  document.getElementById('skip-warning').style.display = 'none';
-}
-
-function cancelSkip() {
-  document.getElementById('modal-background').style.display = 'none';
-  document.getElementById('skip-warning').style.display = 'none';
-}
-
-async function submitVotes() {
-  try {
-    if (!voterCSRFToken) {
-      return
+  function toggleSpinner(value) {
+    if (value===true) {
+      spinner.style.display = "flex"
+    } else {
+      spinner.style.display = "none"
     }
-    toggleSpinner(true)
-    const res = await fetch(`${BASE_URL}/vote/submit`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        "x-csrf-token": voterCSRFToken
-      },
-      body: JSON.stringify({ votes }),
-    });    
-
-    if (!res.ok) throw new Error('Vote submission failed');
-    votingPages.style.display = 'none';
-    thankYouPage.style.display = 'block';
-  } catch (err) {
-    alert(err.message);
-  }finally{
-    toggleSpinner(false)
   }
-}
-adminAccessBtn.addEventListener('click',async ()=>{
-  try {
-    toggleSpinner(true)
-    
-    const serverTimef = await fetch(`${BASE_URL}/server-time`);
-    const serverTimefData = await serverTimef.json();
-    const serverTime = new Date(serverTimefData.serverTime);
-    if (!serverTime) {
-      throw new Error("'Error fetching time:'");
 
-    }
-
-    const votingEndTime = new Date('2025-04-30T16:00:00.000Z');
-    const clientLoadTime = Date.now();
-    const now = new Date(serverTime.getTime() + (Date.now() - clientLoadTime));
-    if (now < votingEndTime) {
-      throw new Error("Election has not ended. Please check back later.");
-    }
-    const res = await fetch(`${BASE_URL}/admin/public-results`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!res.ok) throw new Error(res.message || 'Unauthorized access');
-
-     data = await res.json();
-  
-    const results = data.results.results;
-    const stats = data.results.stats;
-
+  function showVotingPage() {
+    if(!voterCSRFToken) {
+      window.history.replaceState({}, '', '/')
+      return}
+    history.pushState({}, '', "/vote");
     loginPage.style.display = 'none';
-    votingPages.style.display = 'none';
-    thankYouPage.style.display = 'none';
-    adminPanel.style.display = 'block';
-    renderResults(results, stats);
-  } catch (err) {
-    loginMessage.textContent = err.message;
-  }finally{
-    toggleSpinner(false)
-  }
-})
-
-async function showAdminPanel() {
-  let data = null;
-  try {
-    if (!adminCSRFToken) {
-    const password = prompt("Enter admin password:");
-    if (!password || password.trim() === "") {
-      throw new Error("Password is required");
-    }
-    toggleSpinner(true)
-    const csrfToken = await getCSRFToken();
+    votingPages.style.display = 'block';
+    votingPages.innerHTML = '';
     
-    if (!csrfToken) {
-      return
-    }
-    const res = await fetch(`${BASE_URL}/auth/admin/login`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json',
-        "x-csrf-token": csrfToken
-      },
-      body: JSON.stringify({ password })
-    });
-    if (!res.ok) throw new Error('Unauthorized access');
+    if (currentPage >= votingData.length) return;
 
-     data = await res.json();
-  }
-    const results = data.results.results;
-    const stats = data.results.stats;
-
-    loginPage.style.display = 'none';
-    votingPages.style.display = 'none';
-    thankYouPage.style.display = 'none';
-    adminPanel.style.display = 'block';
-    renderResults(results, stats);
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }finally{
-    toggleSpinner(false)
-  }
-};
-
-function renderResults(results, stats) {
-  history.pushState({}, '', "/result");
-  resultsContainer.innerHTML = '';
-  statsContainer.innerHTML= ''
-  // Create stats summary first
-  const statsSection = document.createElement('div');
-  statsSection.classList.add('stats-section');
-
-  statsSection.innerHTML = `
-      <div class="stat-card">
-      <h3>Total Eligible Voters</h3>
-      <p>${stats.totalVoters}</p>
-    </div>
-    <div class="stat-card">
-      <h3>Total Votes Cast</h3>
-      <p>${stats.totalVotesCast}</p>
-    </div>
-  `;
-
-  statsContainer.appendChild(statsSection);
-  
-
-  // Now render the normal results
-  for (let position in results) {
-    const section = document.createElement('div');
+    const data = votingData[currentPage];
     const title = document.createElement('h2');
-    title.textContent = capitalizeWords(position);
-    section.appendChild(title);
-    results[position].candidates.sort((x, y) => y.votes - x.votes);
-    results[position].candidates.forEach(candidate => {
+    title.textContent = data.position;
+    
+
+    votingPages.appendChild(title);
+    
+
+    const candidateRow = document.createElement('div');
+    candidateRow.className = 'candidate-row';
+    // const skipBtn = document.createElement('div');
+    // skipBtn.textContent = "Skip"
+    // skipBtn.classList.add("skip")
+    // votingPages.appendChild(skipBtn);
+
+    data.candidates.forEach(candidate => {
       const box = document.createElement('div');
-      box.classList.add("candidate-box")
-      box.innerHTML = `
-      <span class="candidate-s">
-      <p><strong>${candidate.name}</strong></p>
-      <span>${candidate.votes} ${(candidate.votes>0)?"votes":"vote"}</span>
-      </span>
-      <span class="candidate-img">
-    <img width="100%" height="100%"
-     src="${candidate.name ? `./image/${capitalizeWords(candidate.name.split(' ')[0])}.jpeg` : './image/No.jpeg'}"
-     alt="${candidate.name || 'Default Candidate Image'}" />
-      </span>
+      box.className = 'candidate';
+    
+      const img = document.createElement('img');
+      img.src = candidate.name
+        ? `./image/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
+        : './image/No.jpeg';
+        
+      img.alt = candidate.name;
+    
+      const infoBox = document.createElement('div');
+      infoBox.innerHTML = `
+        <p><strong>${candidate.title} ${candidate.name.toUpperCase()}</strong></p>
+        <p>Candidate for ${data.position}</p>
       `;
-      
-      
-      section.appendChild(box);
+    
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = `vote-${currentPage}`;
+      radio.value = candidate.name.toUpperCase();
+    
+      box.appendChild(img);
+      box.appendChild(infoBox);
+      box.appendChild(radio);
+      box.addEventListener('click',()=>{selectCandidate(box)});
+      candidateRow.appendChild(box);
     });
-     // Valid/Invalid Votes Section
-     const votesSummary = document.createElement('div');
-     votesSummary.classList.add('votes-summary');
-     votesSummary.innerHTML = `
-       <div>Valid Votes: ${results[position].validVotes}</div>
-       <div>Invalid Votes: ${results[position].invalidVotes}</div>
-     `;
-     section.appendChild(votesSummary);
-
-    resultsContainer.appendChild(section);
-  }
-}
-
-async function getCSRFToken() {
-  try {
-    const CSRF_res = await fetch(`${BASE_URL}/csrf-token`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!CSRF_res.ok) {
-      throw new Error('Failed to fetch CSRF token');
+    
+    // ADD this after the loop to handle unopposed positions
+    if (data.candidates.length === 1) {
+      const noneBox = document.createElement('div');
+      noneBox.className = 'candidate';
+    
+      const noneImg = document.createElement('img');
+      noneImg.src = './image/No.jpeg';
+      noneImg.alt = 'None of the Above';
+    
+      const noneInfoBox = document.createElement('div');
+      noneInfoBox.innerHTML = `
+        <p><strong>NO</strong></p>
+        <p>Reject candidate for ${data.position}</p>
+      `;
+    
+      const noneRadio = document.createElement('input');
+      noneRadio.type = 'radio';
+      noneRadio.name = `vote-${currentPage}`;
+      noneRadio.value = 'NO';
+    
+      noneBox.appendChild(noneImg);
+      noneBox.appendChild(noneInfoBox);
+      noneBox.appendChild(noneRadio);
+      noneBox.addEventListener('click',()=>{selectCandidate(noneBox)});
+      candidateRow.appendChild(noneBox);
     }
-    const { csrfToken } = await CSRF_res.json();  
-    return csrfToken;
-  } catch (error) {
-    console.error('Error fetching CSRF token:', error.message);
-    throw error;
+    
+    votingPages.appendChild(candidateRow);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.classList.add("next")
+    nextBtn.textContent = currentPage === votingData.length - 1 ? 'Submit' : 'Next';
+    nextBtn.addEventListener('click', () => {
+      const selected = document.querySelector(`input[name="vote-${currentPage}"]:checked`);
+      if (!selected) return alert("Please select a candidate.");
+
+      votes[data.position] = selected.value;
+      skipOrNextVotin(); 
+    });
+    // skipBtn.addEventListener("click",()=>{
+    //   skipWarning.style.display = "block"
+    //   document.getElementById('modal-background').style.display = 'block';
+    //   document.getElementById('modal-background').style.display = 'block';
+    // });
+    
+    votingPages.appendChild(nextBtn);
   }
-}
 
-closeAdminBtn.addEventListener("click",closeAdminPanel)
+  function selectCandidate(box) {
+    const radio = box.querySelector('input[type="radio"]');
+    if (radio) {
+      radio.checked = true;
 
-function closeAdminPanel() {
-  adminPanel.style.display = 'none';
-  loginPage.style.display = 'block';
-}
-function capitalizeWords(str) {
-  return str.toLowerCase().split(' ').map(word => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  }).join(' ');
-}
+      // Remove `.selected` from all siblings
+      const allCards = document.querySelectorAll('.candidate');
+      allCards.forEach(c => c.classList.remove('selected'));
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Check if the current route is "/result"
-  if (window.location.pathname === '/result') {
-    showAdminPanel();
+      // Add `.selected` to clicked card
+      box.classList.add('selected');
+    }
   }
-});
+
+  function skipOrNextVotin() {
+    currentPage++;
+
+    if (currentPage < votingData.length) {
+      showVotingPage();
+    } else {
+      submitVotes();
+    }  
+
+  }
+
+  document.getElementById("confirm-skip").addEventListener("click",  confirmSkip);
+  document.getElementById("cancel-skip").addEventListener("click", cancelSkip)
+  function confirmSkip() {
+    skipOrNextVotin()
+    document.getElementById('modal-background').style.display = 'none';
+    document.getElementById('skip-warning').style.display = 'none';
+  }
+
+  function cancelSkip() {
+    document.getElementById('modal-background').style.display = 'none';
+    document.getElementById('skip-warning').style.display = 'none';
+  }
+
+  async function submitVotes() {
+    try {
+      if (!voterCSRFToken) {
+        return
+      }
+      toggleSpinner(true)
+      const res = await fetch(`${baseUri}/vote/submit`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          "x-csrf-token": voterCSRFToken
+        },
+        body: JSON.stringify({ votes }),
+      });    
+
+      if (!res.ok) throw new Error('Vote submission failed');
+      votingPages.style.display = 'none';
+      thankYouPage.style.display = 'block';
+    } catch (err) {
+      alert(err.message);
+    }finally{
+      toggleSpinner(false)
+    }
+  }
+  adminAccessBtn.addEventListener('click',async ()=>{
+    try {
+      toggleSpinner(true)
+      
+      const serverTimef = await fetch(`${baseUri}/server-time`);
+      const serverTimefData = await serverTimef.json();
+      const serverTime = new Date(serverTimefData.serverTime);
+      if (!serverTime) {
+        throw new Error("'Error fetching time:'");
+
+      }
+
+      const votingEndTime = new Date('2025-04-30T16:00:00.000Z');
+      const clientLoadTime = Date.now();
+      const now = new Date(serverTime.getTime() + (Date.now() - clientLoadTime));
+      if (now < votingEndTime) {
+        throw new Error("Election has not ended. Please check back later.");
+      }
+      const res = await fetch(`${baseUri}/admin/public-results`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) throw new Error(res.message || 'Unauthorized access');
+
+      data = await res.json();
+    
+      const results = data.results.results;
+      const stats = data.results.stats;
+
+      loginPage.style.display = 'none';
+      votingPages.style.display = 'none';
+      thankYouPage.style.display = 'none';
+      adminPanel.style.display = 'block';
+      renderResults(results, stats);
+    } catch (err) {
+      loginMessage.textContent = err.message;
+    }finally{
+      toggleSpinner(false)
+    }
+  })
+
+  async function showAdminPanel() {
+    let data = null;
+    try {
+      if (!adminCSRFToken) {
+      const password = prompt("Enter admin password:");
+      if (!password || password.trim() === "") {
+        throw new Error("Password is required");
+      }
+      toggleSpinner(true)
+      const csrfToken = await getCSRFToken();
+      
+      if (!csrfToken) {
+        return
+      }
+      const res = await fetch(`${baseUri}/auth/admin/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json',
+          "x-csrf-token": csrfToken
+        },
+        body: JSON.stringify({ password })
+      });
+      if (!res.ok) throw new Error('Unauthorized access');
+
+      data = await res.json();
+    }
+      const results = data.results.results;
+      const stats = data.results.stats;
+
+      loginPage.style.display = 'none';
+      votingPages.style.display = 'none';
+      thankYouPage.style.display = 'none';
+      adminPanel.style.display = 'block';
+      renderResults(results, stats);
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }finally{
+      toggleSpinner(false)
+    }
+  };
+
+  function renderResults(results, stats) {
+    history.pushState({}, '', "/result");
+    resultsContainer.innerHTML = '';
+    statsContainer.innerHTML= ''
+    // Create stats summary first
+    const statsSection = document.createElement('div');
+    statsSection.classList.add('stats-section');
+
+    statsSection.innerHTML = `
+        <div class="stat-card">
+        <h3>Total Eligible Voters</h3>
+        <p>${stats.totalVoters}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Votes Cast</h3>
+        <p>${stats.totalVotesCast}</p>
+      </div>
+    `;
+
+    statsContainer.appendChild(statsSection);
+    
+
+    // Now render the normal results
+    for (let position in results) {
+      const section = document.createElement('div');
+      const title = document.createElement('h2');
+      title.textContent = capitalizeWords(position);
+      section.appendChild(title);
+      results[position].candidates.sort((x, y) => y.votes - x.votes);
+      results[position].candidates.forEach(candidate => {
+        const box = document.createElement('div');
+        box.classList.add("candidate-box")
+        box.innerHTML = `
+        <span class="candidate-s">
+        <p><strong>${candidate.name}</strong></p>
+        <span>${candidate.votes} ${(candidate.votes>0)?"votes":"vote"}</span>
+        </span>
+        <span class="candidate-img">
+      <img width="100%" height="100%"
+      src="${candidate.name ? `./image/${capitalizeWords(candidate.name.split(' ')[0])}.jpeg` : './image/No.jpeg'}"
+      alt="${candidate.name || 'Default Candidate Image'}" />
+        </span>
+        `;
+        
+        
+        section.appendChild(box);
+      });
+      // Valid/Invalid Votes Section
+      const votesSummary = document.createElement('div');
+      votesSummary.classList.add('votes-summary');
+      votesSummary.innerHTML = `
+        <div>Valid Votes: ${results[position].validVotes}</div>
+        <div>Invalid Votes: ${results[position].invalidVotes}</div>
+      `;
+      section.appendChild(votesSummary);
+
+      resultsContainer.appendChild(section);
+    }
+  }
+
+  async function getCSRFToken() {
+    try {
+      const CSRF_res = await fetch(`${baseUri}/csrf-token`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!CSRF_res.ok) {
+        throw new Error('Failed to fetch CSRF token');
+      }
+      const { csrfToken } = await CSRF_res.json();  
+      return csrfToken;
+    } catch (error) {
+      console.error('Error fetching CSRF token:', error.message);
+      throw error;
+    }
+  }
+
+  closeAdminBtn.addEventListener("click",closeAdminPanel)
+
+  function closeAdminPanel() {
+    adminPanel.style.display = 'none';
+    loginPage.style.display = 'block';
+  }
+  function capitalizeWords(str) {
+    return str.toLowerCase().split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check if the current route is "/result"
+    if (window.location.pathname === '/result') {
+      showAdminPanel();
+    }
+  });
 
 
-})();
+  })();
+ 
