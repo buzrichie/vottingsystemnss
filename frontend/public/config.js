@@ -16,8 +16,8 @@ export async function fetchConfig() {
 
     return config; 
   } catch (error) {
-    console.error('Error fetching config:', error);
-    return config; 
+    console.error("Error fetching config:", error);
+    throw error;
   }
 }
 

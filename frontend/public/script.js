@@ -2,9 +2,9 @@ import { fetchConfig } from './config.js';
 
     
   (async function () {  
-    const {data} = await fetchConfig()
-    const baseUri = `${data}/api`;
-    
+    const data = await fetchConfig();
+    const baseUri = `${data.baseUri}/api`;
+      
   // ====== DOM ELEMENTS ======
   const loginPage = document.getElementById('login-page');
   const votingPages = document.getElementById('voting-pages');
@@ -26,10 +26,12 @@ import { fetchConfig } from './config.js';
   let adminCSRFToken = ""
   let votingData = []
 
-  if (!window.history.state) {
-
-    window.history.replaceState({}, '', window.location.pathname);
+  if (window.performance) {
+    // Handle initial load OR refresh for /result
+  if (window.location.pathname === '/result') {
+      showAdminPanel();
   }
+}
 
   window.addEventListener('popstate', ()=>{
     if (window.location.pathname === '/') {
@@ -64,7 +66,12 @@ import { fetchConfig } from './config.js';
         },
         body: JSON.stringify({ nssNumber }),
       });
-      if (!res.ok) throw new Error(data.message || 'Login failed');
+
+      if (!res.ok) {
+        const errorData = await res.json(); 
+        const errorMessage = errorData.message || 'Login failed'; 
+        throw new Error(errorMessage);
+      }
       const data = await res.json();
       
       voterCSRFToken = data.csrfToken;
@@ -245,8 +252,12 @@ import { fetchConfig } from './config.js';
         },
         body: JSON.stringify({ votes }),
       });    
-
-      if (!res.ok) throw new Error('Vote submission failed');
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMessage = errorData.message || 'Vote submission failed';
+        throw new Error(errorMessage);
+      }
+      
       votingPages.style.display = 'none';
       thankYouPage.style.display = 'block';
     } catch (err) {
@@ -278,8 +289,11 @@ import { fetchConfig } from './config.js';
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       });
-
-      if (!res.ok) throw new Error(res.message || 'Unauthorized access');
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMessage = errorData.message || 'Unauthorized access';
+        throw new Error(errorMessage);
+      }
 
       data = await res.json();
     
@@ -320,7 +334,11 @@ import { fetchConfig } from './config.js';
         },
         body: JSON.stringify({ password })
       });
-      if (!res.ok) throw new Error('Unauthorized access');
+      if (!res.ok) {
+        const errorData = await res.json();
+        const errorMessage = errorData.message || 'Unauthorized access';
+        throw new Error(errorMessage);
+      }
 
       data = await res.json();
     }
@@ -402,6 +420,8 @@ import { fetchConfig } from './config.js';
 
   async function getCSRFToken() {
     try {
+      console.log(baseUri);
+      
       const CSRF_res = await fetch(`${baseUri}/csrf-token`, {
         method: 'GET',
         credentials: 'include',
@@ -430,14 +450,5 @@ import { fetchConfig } from './config.js';
       return word.charAt(0).toUpperCase() + word.slice(1);
     }).join(' ');
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Check if the current route is "/result"
-    if (window.location.pathname === '/result') {
-      showAdminPanel();
-    }
-  });
-
-
   })();
  
