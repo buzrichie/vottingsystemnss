@@ -11,6 +11,7 @@ const cors = require('cors');
 const Admin = require('./models/Admin');
 const setDeviceIdCookie = require('./utils/setDeviceIdCookie ');
 const Voter = require('./models/Voter');
+const csrf = require('csurf');
 
 const app = express();
 app.set('trust proxy', true);
@@ -21,8 +22,7 @@ const corsOptions = {origin: baseURL,  credentials: true,
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-
-
+const csrfProtection = csrf({ cookie: true });
 
 mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
@@ -46,52 +46,51 @@ mongoose.connect(process.env.MONGO_URI)
         }
 
         // --- Read and Add Users from processed_data.xlsx ---
-        const filePath = 'processed_data.xlsx'; 
+        // const filePath = 'processed_data.xlsx'; 
         
-        try {
-            const workbook = XLSX.readFile(filePath);
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const votersDataFromExcel = XLSX.utils.sheet_to_json(worksheet);
+        // try {
+        //     const workbook = XLSX.readFile(filePath);
+        //     const sheetName = workbook.SheetNames[0];
+        //     const worksheet = workbook.Sheets[sheetName];
+        //     const votersDataFromExcel = XLSX.utils.sheet_to_json(worksheet);
         
-            const bulkOps = [];
+        //     const bulkOps = [];
+        // 
+        //     for (const voterData of votersDataFromExcel) {
+        //         // Prepare insert operation for each voter
+        //         bulkOps.push({
+        //             insertOne: {
+        //                 document: {
+        //                     nssNumber: voterData['NSS NUMBER'],
+        //                     // ghanaPay: voterData['GHANA PAY'],
+        //                     // surname: voterData['SURNAME'],
+        //                     // firstName: voterData['FIRST NAME'],
+        //                     // placeOfPosting: voterData['PLACE OF POSTING'],
+        //                     // institutionAttended: voterData['INSTITUTION ATTENDED'],
+        //                     // qualification: voterData['QUALIFICATION'],
+        //                     // district: voterData['DISTRICT'],
+        //                     // region: voterData['REGION'],
+        //                     hasVoted: false
+        //                 }
+        //             }
+        //         });
+        //     }
         
-            for (const voterData of votersDataFromExcel) {
-                // Prepare insert operation for each voter
-                bulkOps.push({
-                    insertOne: {
-                        document: {
-                            nssNumber: voterData['NSS NUMBER'],
-                            // ghanaPay: voterData['GHANA PAY'],
-                            // surname: voterData['SURNAME'],
-                            // firstName: voterData['FIRST NAME'],
-                            // placeOfPosting: voterData['PLACE OF POSTING'],
-                            // institutionAttended: voterData['INSTITUTION ATTENDED'],
-                            // qualification: voterData['QUALIFICATION'],
-                            // district: voterData['DISTRICT'],
-                            // region: voterData['REGION'],
-                            hasVoted: false
-                        }
-                    }
-                });
-            }
+        //     // Execute the bulk write operation
+        //     Voter.bulkWrite(bulkOps, { ordered: false })
+        //         .then(result => {
+        //             console.log(`${result.insertedCount} voters added to the database from ${filePath}`);
+        //         })
+        //         .catch(error => {
+        //             if (error.code === 11000) {
+        //                 console.warn('Duplicate key error detected during bulk insert. Some voters may already exist.');
+        //             }
+        //             console.error('Error performing bulk insert:', error);
+        //         });
         
-            // Execute the bulk write operation
-            Voter.bulkWrite(bulkOps, { ordered: false })
-                .then(result => {
-                    console.log(`${result.insertedCount} voters added to the database from ${filePath}`);
-                })
-                .catch(error => {
-                    if (error.code === 11000) {
-                        console.warn('Duplicate key error detected during bulk insert. Some voters may already exist.');
-                    }
-                    console.error('Error performing bulk insert:', error);
-                });
-        
-        } catch (error) {
-            console.error('Error reading or processing the Excel file:', error);
-        }
-        
+        // } catch (error) {
+        //     console.error('Error reading or processing the Excel file:', error);
+        // }
 
         const PORT = process.env.PORT || 5000;
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -108,18 +107,32 @@ app.use((req, res, next)=>{
   next()
 })
 
-app.use('/api/auth', authRoutes);
-app.use('/api/vote', voteRoutes);
+app.use('/api/auth', csrfProtection, authRoutes);
+app.use('/api/vote', csrfProtection, voteRoutes);
 app.use('/api/admin', adminRoutes);
 app.get('/api/server-time', (req, res) => {
     res.status(201).json({
         serverTime: new Date().toISOString()
     });
   });
+  //CSRF for public a
+app.get('/api/csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
+
+   // CSRF Error Handler
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).json({ error: 'Invalid CSRF token' });
+    }
+    next(err);
+});
+
 app.get('/', (req, res) => {
     res.status(201).json({
     message: 'Welcome',
     path: req.originalUrl,
     });
   });
+  
   

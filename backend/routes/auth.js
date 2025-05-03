@@ -64,72 +64,106 @@ function addVote(candidates, candidateName) {
   }
 }
 
-
-router.post('/admin/login',customRateLimiter, async (req, res) => {
+router.post('/admin/login', customRateLimiter, async (req, res) => {
   try {
     const { password } = req.body;
 
-  if (!password){
-    return res.status(401).json({ message: 'Password is requied' });
-  }
-  user = await Admin.findOne({role:"admin" });
-   if (!user) {
-     return res.status(401).json({ message: 'Invalid credentials' });
-   }
-   // Admin login
-  if (user && user.role.toLowerCase() === 'admin') {
+    if (!password) {
+      return res.status(401).json({ message: 'Password is required' });
+    }
+
+    const user = await Admin.findOne({ role: "admin" });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
-  
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
-    const results = await analyzeVotes();
-  
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Create JWT token
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    // Store JWT in an HttpOnly cookie
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure: true, 
+      sameSite: 'Strict',
+      maxAge: 2 * 60 * 60 * 1000 
+    });
+
+    // Clear any brute force attempt tracking
     const deviceId = req.cookies["deviceId"] || req.ip;
     if (global.ipAttempts && global.ipAttempts[deviceId]) {
-      delete global.ipAttempts[deviceId]; 
-      
+      delete global.ipAttempts[deviceId];
     }
-  
-    return res.json({ token, role: 'admin', results });
-  }  
 
-  }catch(e){
-    console.error(e.message)
-    return res.status(500).json({ message: 'Internal Server Error.' , error});
+    // Send CSRF token in response
+    const csrfToken = req.csrfToken(); 
+
+    const results = await analyzeVotes();
+
+    return res.json({ csrfToken, role: 'admin', results });
+
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: 'Internal Server Error.', error: error.message });
   }
-})
+});
 
-router.post('/login',validateVotingTime, customRateLimiter, async (req, res) => {
+router.post('/login', validateVotingTime, customRateLimiter, async (req, res) => {
   try {
     const { nssNumber } = req.body;
     if (!nssNumber) return res.status(401).json({ message: 'No NSS number provided' });
-  
+
     const user = await Voter.findOne({ nssNumber });
-  
-  if (!user) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
 
-  if (user.hasVoted) {
-    return res.status(403).json({ message: 'Already voted.' });
-  }
-  
-  const candidates = await JSON.parse(fs.readFileSync(path.join(__dirname, '../data/candidate.json'), 'utf-8'));
-  
-  const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
-   // Reset the IP attempts on successful login
-   const deviceId = req.cookies["deviceId"] || req.ip;
-   if (global.ipAttempts && global.ipAttempts[deviceId]) {
-     delete global.ipAttempts[deviceId]; 
-   }
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-  res.json({ token, role: 'voter' , candidates});
-} catch (error) {
+    if (user.hasVoted) {
+      return res.status(403).json({ message: 'Already voted.' });
+    }
+
+    const candidates = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/candidate.json'), 'utf-8'));
+
+    // Create JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    // Store JWT in HttpOnly cookie
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure: true, // true in production with HTTPS
+      sameSite: 'Strict',
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours
+    });
+
+    // Reset IP-based attempts
+    const deviceId = req.cookies["deviceId"] || req.ip;
+    if (global.ipAttempts && global.ipAttempts[deviceId]) {
+      delete global.ipAttempts[deviceId];
+    }
+
+    // Generate CSRF token
+    const csrfToken = req.csrfToken();
+
+    res.json({ csrfToken, role: 'voter', candidates });
+
+  } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Internal Server Error.' , error});
-}
+    return res.status(500).json({ message: 'Internal Server Error.', error: error.message });
+  }
 });
-
 
 
 module.exports = router;

@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 const Voter = require('../models/Voter');
 
 exports.authMiddleware = async (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  // const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.cookies?.accessToken;
   if (!token) return res.status(401).json({ message: 'No token provided' });
 
   try {

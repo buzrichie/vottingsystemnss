@@ -1,6 +1,5 @@
 (function () {
-  // const BASE_URL = 'https://nss-election.onrender.com/api';
-  const BASE_URL = 'https://nss-e-demo.onrender.com/api';
+  const BASE_URL = 'https://nss-election.onrender.com/api';
   
 // ====== DOM ELEMENTS ======
 const loginPage = document.getElementById('login-page');
@@ -18,9 +17,9 @@ const closeAdminBtn = document.getElementById("close-admin-btn")
 
 let currentPage = 0;
 let votes = {};
-let token = '';
-let data = null;
-let adminToken = ""
+let voterCSRFToken = "";
+
+let adminCSRFToken = ""
 let votingData = []
 
 if (!window.history.state) {
@@ -49,17 +48,22 @@ loginBtn?.addEventListener('click', async () => {
   }
   try {
     toggleSpinner(true)
+    const csrfToken = await getCSRFToken()
+    if (!csrfToken) {
+      return 
+    }
     const res = await fetch(`${BASE_URL}/auth/login`, {
       method: 'POST',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json',
+        "x-csrf-token": csrfToken
+       },
       body: JSON.stringify({ nssNumber }),
     });
-
-    const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Login failed');
+    const data = await res.json();
     
-    token = data.token;
+    voterCSRFToken = data.csrfToken;
     votingData = data.candidates
     
     currentPage = 0;
@@ -82,7 +86,7 @@ function toggleSpinner(value) {
 }
 
 function showVotingPage() {
-  if(!token) {
+  if(!voterCSRFToken) {
     window.history.replaceState({}, '', '/')
     return}
   history.pushState({}, '', "/vote");
@@ -224,7 +228,7 @@ function cancelSkip() {
 
 async function submitVotes() {
   try {
-    if (!token) {
+    if (!voterCSRFToken) {
       return
     }
     toggleSpinner(true)
@@ -233,7 +237,7 @@ async function submitVotes() {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        "x-csrf-token": voterCSRFToken
       },
       body: JSON.stringify({ votes }),
     });    
@@ -291,24 +295,30 @@ adminAccessBtn.addEventListener('click',async ()=>{
 })
 
 async function showAdminPanel() {
+  let data = null;
   try {
-    if (!adminToken) {
+    if (!adminCSRFToken) {
     const password = prompt("Enter admin password:");
     if (!password || password.trim() === "") {
-      return;
+      throw new Error("Password is required");
     }
     toggleSpinner(true)
+    const csrfToken = await getCSRFToken();
+    
+    if (!csrfToken) {
+      return
+    }
     const res = await fetch(`${BASE_URL}/auth/admin/login`, {
       method: 'POST',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json',
+        "x-csrf-token": csrfToken
+      },
       body: JSON.stringify({ password })
     });
-
     if (!res.ok) throw new Error('Unauthorized access');
 
      data = await res.json();
-     adminToken = data.token;
   }
     const results = data.results.results;
     const stats = data.results.stats;
@@ -319,6 +329,7 @@ async function showAdminPanel() {
     adminPanel.style.display = 'block';
     renderResults(results, stats);
   } catch (err) {
+    console.error(err);
     alert(err.message);
   }finally{
     toggleSpinner(false)
@@ -385,6 +396,24 @@ function renderResults(results, stats) {
   }
 }
 
+async function getCSRFToken() {
+  try {
+    const CSRF_res = await fetch(`${BASE_URL}/csrf-token`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!CSRF_res.ok) {
+      throw new Error('Failed to fetch CSRF token');
+    }
+    const { csrfToken } = await CSRF_res.json();  
+    return csrfToken;
+  } catch (error) {
+    console.error('Error fetching CSRF token:', error.message);
+    throw error;
+  }
+}
 
 closeAdminBtn.addEventListener("click",closeAdminPanel)
 
