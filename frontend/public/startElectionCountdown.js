@@ -1,16 +1,16 @@
-const votingStartTime = new Date('2025-04-30T09:00:00.000Z');
-const votingEndTime = new Date('2025-05-05T17:30:00.000Z');
+import { fetchConfig } from './config.js';
 
 // Save the client load time
 const clientLoadTime = Date.now();
 
 async function fetchServerTime() {
     try {
-      const BASE_URL = 'https://nss-election.onrender.com/api/server-time';
+      const {baseUri} = await fetchConfig()
+      const BASE_URL = `${baseUri}/api/server-time`;
         
       const res = await fetch(BASE_URL);
       const data = await res.json();
-      return new Date(data.serverTime);
+      return data;
     } catch (error) {
       console.error('Error fetching server time:', error);
       return null;
@@ -19,15 +19,18 @@ async function fetchServerTime() {
 
 // Start countdown after getting server time
 (async function () {
-  const serverTime = await fetchServerTime();
-  if (serverTime) {
-    startElectionCountdown(serverTime);
+  const data = await fetchServerTime();
+  if (data) {
+    const serverTime = new Date(data.serverTime);
+    const votingStartTime = new Date(data.votingStartTime);
+    const votingEndTime = new Date(data.votingEndTime);
+    startElectionCountdown(serverTime, votingStartTime, votingEndTime);
   } else {
     console.error('Failed to fetch server time');
   }
 })();
 
-export function startElectionCountdown(serverTime) {
+export function startElectionCountdown(serverTime,votingStartTime,votingEndTime) {
     const timerInterval = setInterval(() => {
       // Adjust current time using server time and elapsed time since load
       const now = new Date(serverTime.getTime() + (Date.now() - clientLoadTime));

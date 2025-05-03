@@ -110,9 +110,11 @@ app.use((req, res, next)=>{
 app.use('/api/auth', csrfProtection, authRoutes);
 app.use('/api/vote', csrfProtection, voteRoutes);
 app.use('/api/admin', adminRoutes);
-app.get('/api/server-time', (req, res) => {
+app.get('/api/server-time', (req, res) => {;
     res.status(201).json({
-        serverTime: new Date().toISOString()
+        serverTime: new Date().toISOString(),
+        votingStartTime: new Date(process.env.VOTING_START).toISOString(),
+        votingEndTime: new Date(process.env.VOTING_END).toISOString(),      
     });
   });
   //CSRF for public a
