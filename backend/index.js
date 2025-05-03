@@ -12,8 +12,13 @@ const Admin = require('./models/Admin');
 const setDeviceIdCookie = require('./utils/setDeviceIdCookie ');
 const Voter = require('./models/Voter');
 const csrf = require('csurf');
+const { initializeSocket, getIO } = require('./utils/socket-io');
+const http = require('http');
 
 const app = express();
+const server = http.createServer(app);
+initializeSocket(server);
+
 app.set('trust proxy', true);
 
 const baseURL = process.env.NODE_ENV==="production" ? process.env.BASE_URL : process.env.LOCAL_BASE_URL;
@@ -93,7 +98,9 @@ mongoose.connect(process.env.MONGO_URI)
         // }
 
         const PORT = process.env.PORT || 5000;
-        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        const serverListen= app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+         // Attach the server to the Socket.IO instance
+        getIO().attach(serverListen);
     })
     .catch(err => console.log(err));
 
