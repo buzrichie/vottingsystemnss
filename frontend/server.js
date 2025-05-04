@@ -29,7 +29,7 @@ app.use(
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      connectSrc: ["'self'", baseURL],
+      connectSrc: ["'self'",  process.env.LOCAL_BACKEND_URI, "ws://localhost:5000"],
       styleSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
       scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
     },
@@ -46,6 +46,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Middleware to prevent directory traversal attacks
+// app.use('/socket.io-client', express.static(path.join(__dirname, 'node_modules/socket.io-client/socket.io.min.js')));
+// Serve static files like images, styles
+app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   const requestedPath = path.resolve(path.join(__dirname, 'public', req.url));
   if (!requestedPath.startsWith(path.join(__dirname, 'public'))) {
@@ -54,8 +57,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files like images, styles
-app.use(express.static(path.join(__dirname, 'public')));
+
+
 // Serve frontend with nonce replacement
 app.get('/config', (req, res) => {
   // Send the baseUri and any other settings you want to expose

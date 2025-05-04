@@ -1,20 +1,20 @@
-let config = {}; 
+let config = {};
 
 // Function to fetch config securely from the backend
 export async function fetchConfig() {
   try {
     // If baseUri is already set, return the config object directly
     if (config.baseUri) {
-      return config; 
+      return config;
     }
 
     // Fetch the config from the backend
-    const res = await fetch('/config'); 
+    const res = await fetch("/config");
     const data = await res.json();
 
-    config.baseUri = data.baseUri;  
+    config.baseUri = data.baseUri;
 
-    return config; 
+    return config;
   } catch (error) {
     console.error("Error fetching config:", error);
     throw error;
