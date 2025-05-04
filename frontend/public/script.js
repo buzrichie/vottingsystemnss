@@ -19,11 +19,12 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
   const votingPages = document.getElementById("voting-pages");
   const thankYouPage = document.getElementById("thank-you");
   const adminPanel = document.getElementById("admin-panel");
-  const loginBtn = document.getElementById("login-btn");
+  const loginForm = document.getElementById("login-form");
   const adminAccessBtn = document.getElementById("admin-access-btn");
   const loginMessage = document.getElementById("login-message");
   const spinner = document.getElementById("spinner");
   const closeAdminBtn = document.getElementById("close-admin-btn");
+  const passwordInput = document.getElementById("password");
   // const skipWarning = document.getElementById("skip-warning")
 
   let currentPage = 0;
@@ -50,10 +51,19 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
     }
   });
 
-  loginBtn?.addEventListener("click", async () => {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
     const nssNumber = document.getElementById("nss-number").value.trim();
+    const password = passwordInput.value;
     if (!nssNumber) {
-      return alert("Please Enter NSS NUMBER to proceed voting.");
+      alert("Please Enter NSS NUMBER to proceed voting.");
+      return;
+    }
+
+    if (!password) {
+      alert("Please enter Password.");
+      return;
     }
     try {
       toggleSpinner(true);
@@ -68,7 +78,7 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
           "Content-Type": "application/json",
           "x-csrf-token": csrfToken,
         },
-        body: JSON.stringify({ nssNumber }),
+        body: JSON.stringify({ nssNumber, password }),
       });
 
       if (!res.ok) {
@@ -356,6 +366,9 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
         data = await res.json();
         setAdminToken(data.csrfToken);
       }
+      if (!data) {
+        return;
+      }
       setResult(data.results.results);
       const results = data.results.results;
       const stats = data.results.stats;
@@ -373,70 +386,6 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
       toggleSpinner(false);
     }
   }
-
-  // function renderResults(results, stats) {
-  //   history.pushState({}, "", "/result");
-  //   resultsContainer.innerHTML = "";
-  //   statsContainer.innerHTML = "";
-  //   // Create stats summary first
-  //   const statsSection = document.createElement("div");
-  //   statsSection.classList.add("stats-section");
-
-  //   statsSection.innerHTML = `
-  //       <div class="stat-card">
-  //       <h3>Total Eligible Voters</h3>
-  //       <p>${stats.totalVoters}</p>
-  //     </div>
-  //     <div class="stat-card">
-  //       <h3>Total Votes Cast</h3>
-  //       <p>${stats.totalVotesCast}</p>
-  //     </div>
-  //   `;
-
-  //   statsContainer.appendChild(statsSection);
-
-  //   // Now render the normal results
-  //   for (let position in results) {
-  //     const section = document.createElement("div");
-  //     const title = document.createElement("h2");
-  //     title.textContent = capitalizeWords(position);
-  //     section.appendChild(title);
-  //     results[position].candidates.sort((x, y) => y.votes - x.votes);
-  //     results[position].candidates.forEach((candidate) => {
-  //       const box = document.createElement("div");
-  //       box.classList.add("candidate-box");
-  //       box.innerHTML = `
-  //       <span class="candidate-s">
-  //       <p><strong>${candidate.name}</strong></p>
-  //       <span>${candidate.votes} ${
-  //         candidate.votes > 0 ? "votes" : "vote"
-  //       }</span>
-  //       </span>
-  //       <span class="candidate-img">
-  //     <img width="100%" height="100%"
-  //     src="${
-  //       candidate.name
-  //         ? `./image/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
-  //         : "./image/No.jpeg"
-  //     }"
-  //     alt="${candidate.name || "Default Candidate Image"}" />
-  //       </span>
-  //       `;
-
-  //       section.appendChild(box);
-  //     });
-  //     // Valid/Invalid Votes Section
-  //     const votesSummary = document.createElement("div");
-  //     votesSummary.classList.add("votes-summary");
-  //     votesSummary.innerHTML = `
-  //       <div>Valid Votes: ${results[position].validVotes}</div>
-  //       <div>Invalid Votes: ${results[position].invalidVotes}</div>
-  //     `;
-  //     section.appendChild(votesSummary);
-
-  //     resultsContainer.appendChild(section);
-  //   }
-  // }
 
   closeAdminBtn.addEventListener("click", closeAdminPanel);
 
