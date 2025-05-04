@@ -1,7 +1,5 @@
-const { Server: HTTPServer } = require('http');
-const { Server: SocketIOServer } = require('socket.io');
-const { authenticateSocketJWT } = require('../middleware/socket-io-auth');
-
+const { Server: HTTPServer } = require("http");
+const { Server: SocketIOServer } = require("socket.io");
 
 let io = null;
 
@@ -12,44 +10,30 @@ let io = null;
 function initializeSocket(httpServer) {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.NODE_ENV === 'production'
-        ? process.env.BASE_URL
-        : process.env.LOCAL_BASE_URL,
-      methods: ['GET', 'POST'],
+      origin:
+        process.env.NODE_ENV === "production"
+          ? process.env.BASE_URL
+          : [process.env.LOCAL_BASE_URL, "ws://localhost:5500"],
+      methods: ["GET", "POST"],
     },
   });
 
   // Apply middleware
-  io.use(authenticateSocketJWT);
-  const userSockets = new Map();
-console.log(" web socket working");
+  //   io.use(authenticateSocketJWT);
+  //   const userSockets = new Map();
+  console.log(" web socket working");
 
-  io.on('connection', (socket) => {
+  io.on("connection", (socket) => {
     // Assuming authenticateSocketJWT attaches the user to the socket
-    const userId = socket.user.id;
+    const clientIP = socket.handshake.address;
+    const socketId = socket.id;
+    console.log(
+      `[Socket.IO] New client connected: ID=${socketId}, IP=${clientIP}`
+    );
 
-    // Disconnect previous sockets for the same user
-    if (userSockets.has(userId)) {
-      userSockets.get(userId).forEach((s) => s.disconnect());
-    }
+    socket.on("notification", (data) => {});
 
-    userSockets.set(userId, [socket]);
-
-    socket.on('notification', (data) => {
-      if (!data) return;
-      socket.join(data); // Join room or channel
-    });
-
-    socket.on('disconnect', () => {
-      for (const [userId, sockets] of userSockets.entries()) {
-        const updatedSockets = sockets.filter((s) => s.id !== socket.id);
-        if (updatedSockets.length === 0) {
-          userSockets.delete(userId);
-        } else {
-          userSockets.set(userId, updatedSockets);
-        }
-      }
-    });
+    socket.on("disconnect", () => {});
   });
 }
 
@@ -59,7 +43,9 @@ console.log(" web socket working");
  */
 function getIO() {
   if (!io) {
-    throw new Error('Socket.io is not initialized. Call initializeSocket first.');
+    throw new Error(
+      "Socket.io is not initialized. Call initializeSocket first."
+    );
   }
   return io;
 }
