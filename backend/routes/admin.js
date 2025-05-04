@@ -1,8 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Vote = require('../models/Vote');
-const { authMiddleware, adminMiddleware, afterElectionMiddleware } = require('../middleware/auth');
-const Voter = require('../models/Voter');
+const Vote = require("../models/Vote");
+const {
+  authMiddleware,
+  adminMiddleware,
+  afterElectionMiddleware,
+} = require("../middleware/auth");
+const Voter = require("../models/Voter");
 
 async function analyzeVotesP() {
   try {
@@ -10,18 +14,18 @@ async function analyzeVotesP() {
     const [votes, totalVoters, totalVotesCast] = await Promise.all([
       Vote.find(),
       Voter.countDocuments(),
-      Voter.countDocuments({ hasVoted: true })
+      Voter.countDocuments({ hasVoted: true }),
     ]);
 
     const analyzedResults = {};
 
     for (const vote of votes) {
-      const position = vote.position || 'Unknown';
+      const position = vote.position || "Unknown";
       if (!analyzedResults[position]) {
         analyzedResults[position] = {
           candidates: [],
           validVotes: 0,
-          invalidVotes: 0
+          invalidVotes: 0,
         };
       }
 
@@ -37,17 +41,17 @@ async function analyzeVotesP() {
       results: analyzedResults,
       stats: {
         totalVoters,
-        totalVotesCast
-      }
+        totalVotesCast,
+      },
     };
   } catch (error) {
-    console.error('Error analyzing votes:', error);
-    throw new Error('Error analyzing vote data.');
+    console.error("Error analyzing votes:", error);
+    throw new Error("Error analyzing vote data.");
   }
 }
 
 function addVoteP(candidates, candidateName) {
-  const existingCandidate = candidates.find(c => c.name === candidateName);
+  const existingCandidate = candidates.find((c) => c.name === candidateName);
 
   if (existingCandidate) {
     existingCandidate.votes++;
@@ -57,13 +61,13 @@ function addVoteP(candidates, candidateName) {
 }
 
 // Admin dashboard to get results
-router.get('/results', authMiddleware, adminMiddleware, async (req, res) => {
+router.get("/results", authMiddleware, adminMiddleware, async (req, res) => {
   const votes = await Vote.find();
-  
+
   const results = {};
 
-  if (votes.length >0 ) {
-    votes.forEach(v => {
+  if (votes.length > 0) {
+    votes.forEach((v) => {
       for (let [position, candidate] of Object.entries(v.votes)) {
         if (!results[position]) results[position] = {};
         results[position][candidate] = (results[position][candidate] || 0) + 1;
@@ -73,17 +77,17 @@ router.get('/results', authMiddleware, adminMiddleware, async (req, res) => {
 
   res.json(results);
 });
-router.get('/public-results', afterElectionMiddleware, async (req, res) => {
+router.get("/public-results", afterElectionMiddleware, async (req, res) => {
   try {
-    
-  const results = await analyzeVotesP();
+    const results = await analyzeVotesP();
 
-  return res.json({ results });
-  
-} catch (error) {
- console.log(error);
-    
-}
+    return res.json({ results });
+  } catch (error) {
+    console.error(error.message);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error.", error: error.message });
+  }
 });
 
 module.exports = router;
