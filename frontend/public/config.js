@@ -3,18 +3,18 @@ let config = {};
 // Function to fetch config securely from the backend
 export async function fetchConfig() {
   try {
-    // If baseUri is already set, return the config object directly
-    if (config.baseUri) {
-      return config;
-    }
+    // // If baseUri is already set, return the config object directly
+    // if (config.baseUri) {
+    //   return config;
+    // }
 
-    // Fetch the config from the backend
-    const res = await fetch("/config");
-    const data = await res.json();
+    // // Fetch the config from the backend
+    // const res = await fetch("/config");
+    // const data = await res.json();
 
-    config.baseUri = data.baseUri;
+    // config.baseUri = data.baseUri;
 
-    return config;
+    return "https://nss-awutusenya.onrender.com";
   } catch (error) {
     console.error("Error fetching config:", error);
     throw error;
