@@ -310,10 +310,10 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
         throw new Error(errorMessage);
       }
 
-      data = await res.json();
+      const clintData = await res.json();
 
-      const results = data.results.results;
-      const stats = data.results.stats;
+      const results = clintData.results.results;
+      const stats = clintData.results.stats;
 
       loginPage.style.display = "none";
       votingPages.style.display = "none";
