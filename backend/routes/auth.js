@@ -97,7 +97,7 @@ router.post("/admin/login", customRateLimiter, async (req, res) => {
     res.cookie("accessToken", atoken, {
       httpOnly: true,
       secure: true,
-      sameSite: "Strict",
+      sameSite: process.env.NODE_ENV == "production" ? "None" : "Lax",
       maxAge: 2 * 60 * 60 * 1000,
     });
 
@@ -173,7 +173,7 @@ router.post(
       res.cookie("accessToken", atoken, {
         httpOnly: true,
         secure: true,
-        sameSite: "Strict",
+        sameSite: process.env.NODE_ENV == "production" ? "None" : "Lax",
         maxAge: 2 * 60 * 60 * 1000,
       });
 
