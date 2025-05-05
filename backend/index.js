@@ -130,8 +130,8 @@ app.use((req, res, next) => {
 });
 // Apply a general rate limiter
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
+  windowMs: 10 * 60 * 1000,
+  max: 20,
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,

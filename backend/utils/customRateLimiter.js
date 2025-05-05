@@ -56,7 +56,7 @@ const customRateLimiter = (req, res, next) => {
   }
 
   // Handle rate-limiting logic (4 failed attempts max)
-  if (attempts.count >= 4) {
+  if (attempts.count > 2) {
     // Ban the deviceId for 24 hours after 4 failed attempts
     attempts.bannedUntil = currentTime + 24 * 60 * 60 * 1000; // Ban for 24 hours
     return res.status(403).json({
