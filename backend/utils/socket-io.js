@@ -13,7 +13,7 @@ function initializeSocket(httpServer) {
       origin:
         process.env.NODE_ENV === "production"
           ? process.env.BASE_URL
-          : [process.env.LOCAL_BASE_URL, "ws://localhost:5500"],
+          : [process.env.LOCAL_BASE_URL, process.env.BACKEND_SIO],
       methods: ["GET", "POST"],
     },
   });
