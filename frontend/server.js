@@ -34,7 +34,7 @@ app.use(
     useDefaults: true,
     directives: {
       defaultSrc: ["'self'"],
-      connectSrc: ["'self'", baseURL, "ws://localhost:5000"],
+      connectSrc: ["'self'", baseURL, process.env.BACKEND_SIO],
       styleSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
       scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.nonce}'`],
     },
