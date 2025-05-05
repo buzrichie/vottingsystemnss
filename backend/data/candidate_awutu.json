@@ -1,0 +1,34 @@
+[
+  {
+    "position": "President",
+    "candidates": [
+      { "name": "Steven Quaye", "title": "Mr." },
+      { "name": "Prince Opoku", "title": "Mr." },
+      { "name": "John Attokpla", "title": "Mr." },
+      { "name": "Christopher Ansah Djan", "title": "Mr." }
+    ]
+  },
+  {
+    "position": "Vice President",
+    "candidates": [{ "name": "Felix Afriyie Boateng", "title": "Mr." }]
+  },
+  {
+    "position": "General Secretary",
+    "candidates": [{ "name": "Richmond Owiredu Boateng", "title": "Mr." }]
+  },
+  {
+    "position": "Financial Secretary",
+    "candidates": [{ "name": "Sylvia Doughan", "title": "Ms." }]
+  },
+  {
+    "position": "Organizer",
+    "candidates": [
+      { "name": "Lord Sackey", "title": "Mr." },
+      { "name": "Vincent Akpabla", "title": "Mr." }
+    ]
+  },
+  {
+    "position": "WOCOM",
+    "candidates": [{ "name": "Emmanuella Afia Dentsui", "title": "Ms." }]
+  }
+]

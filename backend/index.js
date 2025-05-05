@@ -58,7 +58,7 @@ mongoose
     }
 
     // --- Read and Add Users from processed_data.xlsx ---
-    // const filePath = "processed_data.xlsx";
+    // const filePath = "./localAssert/NSS_AWUTU_SENYA_EAST_MUNICIPAL_NominalRoll.xlsx";
 
     // try {
     //   const workbook = XLSX.readFile(filePath);
@@ -74,7 +74,6 @@ mongoose
     //     const plainPassword = Math.random().toString(36).slice(-8);
     //     const saltRounds = 10;
     //     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-    //     // const hashedPassword = await bcrypt.hash(process.env.PASSWORD, 10);
 
     //     // Create the database insert operation
     //     bulkOps.push({
@@ -101,7 +100,7 @@ mongoose
     //   const newWorksheet = XLSX.utils.json_to_sheet(updatedData);
     //   const newWorkbook = XLSX.utils.book_new();
     //   XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Updated Voters");
-    //   XLSX.writeFile(newWorkbook, "voters_with_passwords.xlsx");
+    //   XLSX.writeFile(newWorkbook, "awutu-voters_with_passwords.xlsx");
 
     //   console.log(
     //     `${bulkOps.length} voters added to DB and exported to voters_with_passwords.xlsx`
