@@ -13,8 +13,10 @@ const setDeviceIdCookie = require("./utils/setDeviceIdCookie ");
 const Voter = require("./models/Voter");
 const csrf = require("csurf");
 const http = require("http");
+const mongoSanitize = require("express-mongo-sanitize");
 
 const app = express();
+app.use(mongoSanitize());
 // const server = http.createServer(app);
 // initializeSocket(server);
 
