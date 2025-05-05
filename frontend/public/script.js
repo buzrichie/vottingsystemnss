@@ -1,5 +1,4 @@
 import { fetchConfig } from "./config.js";
-import { getCSRFToken } from "./getCSRF.js";
 import { renderResults } from "./js/renderVoteResult.js";
 import {
   getAdminToken,
@@ -53,30 +52,23 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
 
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const nssNumber = document.getElementById("nss-number").value.trim();
     const password = passwordInput.value;
     if (!nssNumber) {
       alert("Please Enter NSS NUMBER to proceed voting.");
       return;
     }
-
     if (!password) {
       alert("Please enter Password.");
       return;
     }
     try {
       toggleSpinner(true);
-      const csrfToken = await getCSRFToken();
-      if (!csrfToken) {
-        return;
-      }
       const res = await fetch(`${baseUri}/auth/login`, {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "x-csrf-token": csrfToken,
         },
         body: JSON.stringify({ nssNumber, password }),
       });
@@ -270,7 +262,7 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "x-csrf-token": getToken(),
+          Authorization: `Bearer ${getToken()}`,
         },
         body: JSON.stringify({ votes }),
       });
@@ -344,17 +336,11 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
           throw new Error("Password is required");
         }
         toggleSpinner(true);
-        const csrfToken = await getCSRFToken();
-
-        if (!csrfToken) {
-          return;
-        }
         const res = await fetch(`${baseUri}/auth/admin/login`, {
           method: "POST",
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            "x-csrf-token": csrfToken,
           },
           body: JSON.stringify({ password }),
         });

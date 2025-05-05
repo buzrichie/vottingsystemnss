@@ -82,14 +82,19 @@ router.post("/admin/login", customRateLimiter, async (req, res) => {
     }
 
     // Create JWT token
-    const token = jwt.sign(
+    const atoken = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRETC,
+      { expiresIn: "2h" }
+    );
 
     // Store JWT in an HttpOnly cookie
-    res.cookie("accessToken", token, {
+    res.cookie("accessToken", atoken, {
       httpOnly: true,
       secure: true,
       sameSite: "Strict",
@@ -102,12 +107,9 @@ router.post("/admin/login", customRateLimiter, async (req, res) => {
       delete global.ipAttempts[deviceId];
     }
 
-    // Send CSRF token in response
-    const csrfToken = req.csrfToken();
-
     const results = await analyzeVotes();
 
-    return res.json({ csrfToken, role: "admin", results });
+    return res.json({ csrfToken: token, role: "admin", results });
   } catch (error) {
     console.error(error.message);
     return res
@@ -153,14 +155,19 @@ router.post(
       );
 
       // Create JWT
-      const token = jwt.sign(
+      const atoken = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: "2h" }
       );
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRETC,
+        { expiresIn: "2h" }
+      );
 
       // Store JWT in HttpOnly cookie
-      res.cookie("accessToken", token, {
+      res.cookie("accessToken", atoken, {
         httpOnly: true,
         secure: true,
         sameSite: "Strict",
@@ -173,10 +180,7 @@ router.post(
         delete global.ipAttempts[deviceId];
       }
 
-      // Generate CSRF token
-      const csrfToken = req.csrfToken();
-
-      res.json({ csrfToken, role: "voter", candidates });
+      res.json({ csrfToken: token, role: "voter", candidates });
     } catch (error) {
       console.error(error);
       return res

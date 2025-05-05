@@ -33,7 +33,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-const csrfProtection = csrf({ cookie: true });
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -128,8 +127,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/auth", csrfProtection, authRoutes);
-app.use("/api/vote", csrfProtection, voteRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/vote", voteRoutes);
 app.use("/api/admin", adminRoutes);
 app.get("/api/server-time", (req, res) => {
   res.status(201).json({
@@ -139,9 +138,9 @@ app.get("/api/server-time", (req, res) => {
   });
 });
 //CSRF for public a
-app.get("/api/csrf-token", csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
+// app.get("/api/csrf-token", (req, res) => {
+
+// });
 
 // CSRF Error Handler
 app.use((err, req, res, next) => {
