@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 
@@ -6,8 +6,6 @@ dotenv.config();
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  port: 587,
-  secure: true,
   auth: {
     user: process.env.MAILER_USER,
     pass: process.env.MAILER_PASSWORD,
@@ -19,8 +17,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
-const mailer = async (from, to, subject, text, html = "</br>") => {
+const mailer = async (from, to, subject, text, html = "") => {
   try {
     const info = await transporter.sendMail({
       from,
@@ -29,9 +26,10 @@ const mailer = async (from, to, subject, text, html = "</br>") => {
       text,
       html,
     });
+    console.log(`✅ Email sent: ${info.messageId}`);
+    return info;
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw new Error("Failed to send email");
+    console.error(`❌ Failed to send to ${to}:`, error.message);
   }
 };
 
