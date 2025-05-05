@@ -14,7 +14,6 @@ const Voter = require("./models/Voter");
 const csrf = require("csurf");
 const { initializeSocket, getIO } = require("./utils/socket-io");
 const http = require("http");
-const mongoSanitize = require("express-mongo-sanitize");
 
 const app = express();
 // const server = http.createServer(app);
@@ -34,7 +33,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-app.use(mongoSanitize());
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(async () => {
