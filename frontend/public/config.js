@@ -13,8 +13,8 @@ export async function fetchConfig() {
     // const data = await res.json();
 
     // config.baseUri = data.baseUri;
-
-    config.baseUri = "https://nss-awutusenya.onrender.com";
+    config.baseUri = "http://localhost:5000";
+    // config.baseUri = "https://nss-awutusenya.onrender.com";
 
     return config;
   } catch (error) {
