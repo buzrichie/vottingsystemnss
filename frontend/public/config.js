@@ -13,8 +13,9 @@ export async function fetchConfig() {
     // const data = await res.json();
 
     // config.baseUri = data.baseUri;
+    config.baseUri = "https://nss-awutusenya.onrender.com";
 
-    return "https://nss-awutusenya.onrender.com";
+    return config;
   } catch (error) {
     console.error("Error fetching config:", error);
     throw error;
