@@ -13,6 +13,7 @@ const setDeviceIdCookie = require("./utils/setDeviceIdCookie ");
 const Voter = require("./models/Voter");
 const csrf = require("csurf");
 const http = require("http");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 
@@ -126,6 +127,14 @@ app.use((req, res, next) => {
     console.log("Requested body:", req.body);
   }
   next();
+});
+// Apply a general rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use("/api/auth", authRoutes);
