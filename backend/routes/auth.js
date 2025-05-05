@@ -151,7 +151,10 @@ router.post(
       }
 
       const candidates = JSON.parse(
-        fs.readFileSync(path.join(__dirname, "../data/candidate.json"), "utf-8")
+        fs.readFileSync(
+          path.join(__dirname, "../data/candidate_awutu.json"),
+          "utf-8"
+        )
       );
 
       // Create JWT
