@@ -12,7 +12,6 @@ const Admin = require("./models/Admin");
 const setDeviceIdCookie = require("./utils/setDeviceIdCookie ");
 const Voter = require("./models/Voter");
 const csrf = require("csurf");
-const { initializeSocket, getIO } = require("./utils/socket-io");
 const http = require("http");
 
 const app = express();

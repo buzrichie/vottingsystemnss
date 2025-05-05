@@ -4,7 +4,6 @@ const Vote = require("../models/Vote");
 const Voter = require("../models/Voter");
 const { authMiddleware } = require("../middleware/auth");
 const { validateVotingTime } = require("../middleware/validateVotingTime");
-const { getIO } = require("../utils/socket-io");
 
 const validPositions = [
   "president",
@@ -66,12 +65,6 @@ router.post("/submit", authMiddleware, validateVotingTime, async (req, res) => {
           result[position].candidates.push({ name: candidate });
         }
       }
-
-      // Emit update to all connected clients
-      getIO().emit("new:vote", {
-        result,
-      });
-
       res.status(200).json({ message: "Vote submitted successfully.", result });
     }
   } catch (error) {
