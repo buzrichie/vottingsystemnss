@@ -472,6 +472,6 @@ input[type="radio"] {
     padding: 0 20px;
   }
   .candidate {
-    width: 100%;
+    flex-basis: 100%;
   }
 }

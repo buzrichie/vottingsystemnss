@@ -6,7 +6,8 @@ exports.authMiddleware = async (req, res, next) => {
   if (!ctoken) return res.status(401).json({ message: "No token provided" });
 
   const token = req.cookies?.accessToken;
-  if (!token) return res.status(401).json({ message: "No token provided" });
+  if (!token)
+    return res.status(401).json({ message: "No Access token provided" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

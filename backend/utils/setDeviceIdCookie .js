@@ -12,7 +12,7 @@ const setDeviceIdCookie = (req, res, next) => {
       maxAge: 3 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: true,
-      sameSite: process.env.NODE_ENV == "production" ? "Strict" : "Lax",
+      sameSite: process.env.NODE_ENV == "production" ? "None" : "Lax",
     });
   }
   next();
