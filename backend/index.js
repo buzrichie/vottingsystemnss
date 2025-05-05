@@ -17,8 +17,8 @@ const http = require("http");
 const mongoSanitize = require("express-mongo-sanitize");
 
 const app = express();
-const server = http.createServer(app);
-initializeSocket(server);
+// const server = http.createServer(app);
+// initializeSocket(server);
 
 app.set("trust proxy", true);
 
@@ -58,7 +58,8 @@ mongoose
     }
 
     // --- Read and Add Users from processed_data.xlsx ---
-    // const filePath = "./localAssert/NSS_AWUTU_SENYA_EAST_MUNICIPAL_NominalRoll.xlsx";
+    // const filePath =
+    //   "./localAssert/NSS_AWUTU_SENYA_EAST_MUNICIPAL_NominalRoll.xlsx";
 
     // try {
     //   const workbook = XLSX.readFile(filePath);
@@ -114,7 +115,7 @@ mongoose
       console.log(`Server running on port ${PORT}`)
     );
     // Attach the server to the Socket.IO instance
-    getIO().attach(serverListen);
+    // getIO().atnpm runtach(serverListen);
   })
   .catch((err) => console.log(err));
 
