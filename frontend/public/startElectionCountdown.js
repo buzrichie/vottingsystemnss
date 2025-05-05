@@ -6,8 +6,6 @@ const clientLoadTime = Date.now();
 async function fetchServerTime() {
   try {
     const { baseUri } = await fetchConfig();
-    console.log(baseUri);
-
     const BASE_URL = `${baseUri}/api/server-time`;
 
     const res = await fetch(BASE_URL);
