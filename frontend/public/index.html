@@ -8,7 +8,7 @@
     <link nonce="__NONCE__" rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="main-wrapper">
+    <div id="app" class="main-wrapper">
       <!-- Login Page -->
       <div id="login-page">
         <span class="nss-logo-wrapper"
@@ -42,11 +42,16 @@
         </div>
 
         <form id="login-form">
-          <input type="text" id="nss-number" placeholder="Enter NSS Number" />
+          <input
+            type="text"
+            id="nss-number"
+            autocomplete="name"
+            placeholder="Enter NSS Number"
+          />
           <input
             type="password"
             id="password"
-            autocomplete
+            autocomplete="current-password"
             placeholder="Enter Password"
           />
 
@@ -121,6 +126,7 @@
     </div>
 
     <script nonce="__NONCE__" type="module" src="script.js"></script>
+    <script nonce="__NONCE__" type="module" src="js/utils/router.js"></script>
     <script
       nonce="__NONCE__"
       type="module"
