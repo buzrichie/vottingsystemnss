@@ -1,4 +1,4 @@
-const AnalyticsJs = require("../models/Analytics,js");
+const AnalyticsJs = require("../models/Analytics.js");
 
 const logAnalytics = async (deviceId, attempts) => {
   const logData = {
