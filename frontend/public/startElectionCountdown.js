@@ -1,21 +1,7 @@
-import { fetchConfig } from "./config.js";
+import { fetchServerTime } from "./js/services/fetchServerTime.js";
 
 // Save the client load time
 const clientLoadTime = Date.now();
-
-async function fetchServerTime() {
-  try {
-    const { baseUri } = await fetchConfig();
-    const BASE_URL = `${baseUri}/api/server-time`;
-
-    const res = await fetch(BASE_URL);
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching server time:", error);
-    return null;
-  }
-}
 
 // Start countdown after getting server time
 (async function () {
