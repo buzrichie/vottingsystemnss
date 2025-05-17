@@ -1,13 +1,19 @@
-import { fetchConfig } from "./config.js";
+import { fetchConfig } from "./js/services/config.js";
 import { renderResults } from "./js/renderVoteResult.js";
 import {
   getAdminToken,
   getToken,
   setAdminToken,
   setToken,
-} from "./js/tokenManager.js";
+} from "./js/services/tokenManager.js";
 import { capitalizeWords } from "./js/utils/capitaliseWord.js";
-import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
+import { navigateTo } from "./js/utils/router.js";
+import {
+  getResult,
+  getStats,
+  setResult,
+  setStats,
+} from "./js/services/vote_stats_n_results.js";
 
 (async function () {
   const data = await fetchConfig();
@@ -34,6 +40,9 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
     // Handle initial load OR refresh for /result
     if (window.location.pathname === "/result") {
       showAdminPanel();
+    }
+    if (window.location.pathname === "/register") {
+      navigateTo(window.location.pathname);
     }
   }
 
@@ -296,30 +305,36 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
       const now = new Date(
         serverTime.getTime() + (Date.now() - clientLoadTime)
       );
-      if (now < votingEndTime) {
+      if (now < votingEndTime && !getAdminToken()) {
         throw new Error("Election has not ended. Please check back later.");
       }
-      const res = await fetch(`${baseUri}/admin/public-results`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        const errorMessage = errorData.message || "Unauthorized access";
-        throw new Error(errorMessage);
+
+      if (now < votingEndTime && !getResult()) {
+        const res = await fetch(`${baseUri}/admin/public-results`, {
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+          const errorData = await res.json();
+          const errorMessage = errorData.message || "Unauthorized access";
+          throw new Error(errorMessage);
+        }
+
+        const clintData = await res.json();
+        setResult(clintData.results.results);
+        setStats(clintData.results.stats);
+        const results = getResult();
+        const stats = getStats();
+
+        loginPage.style.display = "none";
+        votingPages.style.display = "none";
+        thankYouPage.style.display = "none";
+        adminPanel.style.display = "block";
+        renderResults(results, stats);
+      } else {
+        showAdminPanel();
       }
-
-      const clintData = await res.json();
-
-      const results = clintData.results.results;
-      const stats = clintData.results.stats;
-
-      loginPage.style.display = "none";
-      votingPages.style.display = "none";
-      thankYouPage.style.display = "none";
-      adminPanel.style.display = "block";
-      renderResults(results, stats);
     } catch (err) {
       loginMessage.textContent = err.message;
     } finally {
@@ -328,7 +343,6 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
   });
 
   async function showAdminPanel() {
-    let data = null;
     try {
       if (!getAdminToken()) {
         const password = prompt("Enter admin password:");
@@ -349,16 +363,14 @@ import { getResult, setResult, setStats } from "./voteStats-Resultt.js";
           const errorMessage = errorData.message || "Unauthorized access";
           throw new Error(errorMessage);
         }
-        data = await res.json();
+        const data = await res.json();
         setAdminToken(data.csrfToken);
+        setResult(data.results.results);
+        setStats(data.results.stats);
       }
-      if (!data) {
-        return;
-      }
-      setResult(data.results.results);
-      const results = data.results.results;
-      const stats = data.results.stats;
-      setStats(stats);
+
+      const results = getResult();
+      const stats = getStats();
 
       loginPage.style.display = "none";
       votingPages.style.display = "none";
