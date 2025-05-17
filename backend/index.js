@@ -1,5 +1,4 @@
 require("dotenv").config();
-const XLSX = require("xlsx");
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
@@ -9,11 +8,11 @@ const adminRoutes = require("./routes/admin");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const Admin = require("./models/Admin");
-const setDeviceIdCookie = require("./utils/setDeviceIdCookie ");
-const Voter = require("./models/Voter");
+const setDeviceIdCookie = require("./utils/setDeviceIdCookie");
 const csrf = require("csurf");
 const http = require("http");
 const rateLimit = require("express-rate-limit");
+const voterToDB = require("./utils/voters_to_database");
 
 const app = express();
 
@@ -57,58 +56,7 @@ mongoose
       console.log("Admin user already exists");
     }
 
-    // --- Read and Add Users from processed_data.xlsx ---
-    // const filePath =
-    //   "./localAssert/NSS_AWUTU_SENYA_EAST_MUNICIPAL_NominalRoll.xlsx";
-
-    // try {
-    //   const workbook = XLSX.readFile(filePath);
-    //   const sheetName = workbook.SheetNames[0];
-    //   const worksheet = workbook.Sheets[sheetName];
-    //   const votersDataFromExcel = XLSX.utils.sheet_to_json(worksheet);
-
-    //   const bulkOps = [];
-    //   const updatedData = [];
-
-    //   for (const voterData of votersDataFromExcel) {
-    //     // Generate a random password
-    //     const plainPassword = Math.random().toString(36).slice(-8);
-    //     const saltRounds = 10;
-    //     const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-
-    //     // Create the database insert operation
-    //     bulkOps.push({
-    //       insertOne: {
-    //         document: {
-    //           nssNumber: voterData["NSS NUMBER"],
-    //           password: hashedPassword,
-    //           hasVoted: false,
-    //         },
-    //       },
-    //     });
-
-    //     // Store plain password for Excel export
-    //     updatedData.push({
-    //       ...voterData,
-    //       Password: plainPassword,
-    //     });
-    //   }
-
-    //   // Bulk insert to database
-    //   await Voter.bulkWrite(bulkOps, { ordered: false });
-
-    //   // Write updated data (with plain passwords) to a new Excel file
-    //   const newWorksheet = XLSX.utils.json_to_sheet(updatedData);
-    //   const newWorkbook = XLSX.utils.book_new();
-    //   XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, "Updated Voters");
-    //   XLSX.writeFile(newWorkbook, "awutu-voters_with_passwords.xlsx");
-
-    //   console.log(
-    //     `${bulkOps.length} voters added to DB and exported to voters_with_passwords.xlsx`
-    //   );
-    // } catch (error) {
-    //   console.error("Error processing data:", error);
-    // }
+    // await voterToDB("./localAssert/NSS_Demo_Voters.xlsx");
 
     const PORT = process.env.PORT || 5000;
     const serverListen = app.listen(PORT, () =>
