@@ -14,6 +14,9 @@ import {
   setResult,
   setStats,
 } from "./js/services/vote_stats_n_results.js";
+import { adminShowResult } from "./js/utils/adminShowResult.js";
+import { toggleSpinner } from "./js/services/toggleSpinner.js";
+import { submitVotes } from "./js/services/submitVotes.js";
 
 (async function () {
   const data = await fetchConfig();
@@ -27,7 +30,6 @@ import {
   const loginForm = document.getElementById("login-form");
   const adminAccessBtn = document.getElementById("admin-access-btn");
   const loginMessage = document.getElementById("login-message");
-  const spinner = document.getElementById("spinner");
   const closeAdminBtn = document.getElementById("close-admin-btn");
   const passwordInput = document.getElementById("password");
   // const skipWarning = document.getElementById("skip-warning")
@@ -35,16 +37,6 @@ import {
   let currentPage = 0;
   let votes = {};
   let votingData = [];
-
-  if (window.performance) {
-    // Handle initial load OR refresh for /result
-    if (window.location.pathname === "/result") {
-      showAdminPanel();
-    }
-    if (window.location.pathname === "/register") {
-      navigateTo(window.location.pathname);
-    }
-  }
 
   window.addEventListener("popstate", () => {
     if (window.location.pathname === "/") {
@@ -55,7 +47,7 @@ import {
       showVotingPage();
     }
     if (window.location.pathname === "/result") {
-      showAdminPanel();
+      adminShowResult();
     }
   });
 
@@ -101,14 +93,6 @@ import {
       toggleSpinner(false);
     }
   });
-
-  function toggleSpinner(value) {
-    if (value === true) {
-      spinner.style.display = "flex";
-    } else {
-      spinner.style.display = "none";
-    }
-  }
 
   function showVotingPage() {
     if (!getToken()) {
@@ -235,13 +219,23 @@ import {
     }
   }
 
-  function skipOrNextVotin() {
+  async function skipOrNextVotin() {
     currentPage++;
-
     if (currentPage < votingData.length) {
       showVotingPage();
     } else {
-      submitVotes();
+      if (!votes) {
+        alert("No candidate selected.");
+      }
+      await submitVotes(votes)
+        .then((res) => {
+          console.log(res);
+          votingPages.style.display = "none";
+          thankYouPage.style.display = "block";
+        })
+        .catch((err) => {
+          console.error("Submission failed", err);
+        });
     }
   }
 
@@ -260,35 +254,6 @@ import {
     document.getElementById("skip-warning").style.display = "none";
   }
 
-  async function submitVotes() {
-    try {
-      if (!getToken()) {
-        return;
-      }
-      toggleSpinner(true);
-      const res = await fetch(`${baseUri}/vote/submit`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({ votes }),
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        const errorMessage = errorData.message || "Vote submission failed";
-        throw new Error(errorMessage);
-      }
-
-      votingPages.style.display = "none";
-      thankYouPage.style.display = "block";
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      toggleSpinner(false);
-    }
-  }
   adminAccessBtn.addEventListener("click", async () => {
     try {
       toggleSpinner(true);
@@ -333,7 +298,7 @@ import {
         adminPanel.style.display = "block";
         renderResults(results, stats);
       } else {
-        showAdminPanel();
+        adminShowResult();
       }
     } catch (err) {
       loginMessage.textContent = err.message;
@@ -341,49 +306,6 @@ import {
       toggleSpinner(false);
     }
   });
-
-  async function showAdminPanel() {
-    try {
-      if (!getAdminToken()) {
-        const password = prompt("Enter admin password:");
-        if (!password || password.trim() === "") {
-          throw new Error("Password is required");
-        }
-        toggleSpinner(true);
-        const res = await fetch(`${baseUri}/auth/admin/login`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ password }),
-        });
-        if (!res.ok) {
-          const errorData = await res.json();
-          const errorMessage = errorData.message || "Unauthorized access";
-          throw new Error(errorMessage);
-        }
-        const data = await res.json();
-        setAdminToken(data.csrfToken);
-        setResult(data.results.results);
-        setStats(data.results.stats);
-      }
-
-      const results = getResult();
-      const stats = getStats();
-
-      loginPage.style.display = "none";
-      votingPages.style.display = "none";
-      thankYouPage.style.display = "none";
-      adminPanel.style.display = "block";
-      renderResults(results, stats);
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
-    } finally {
-      toggleSpinner(false);
-    }
-  }
 
   closeAdminBtn.addEventListener("click", closeAdminPanel);
 
