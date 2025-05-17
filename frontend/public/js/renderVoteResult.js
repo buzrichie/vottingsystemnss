@@ -1,9 +1,8 @@
 import { capitalizeWords } from "./utils/capitaliseWord.js";
+const resultsContainer = document.getElementById("results-container");
+const statsContainer = document.getElementById("stats-container");
 
 export function renderResults(results, stats) {
-  const resultsContainer = document.getElementById("results-container");
-  const statsContainer = document.getElementById("stats-container");
-
   history.pushState({}, "", "/result");
   resultsContainer.innerHTML = "";
   statsContainer.innerHTML = "";
