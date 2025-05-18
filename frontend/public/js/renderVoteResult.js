@@ -44,8 +44,8 @@ export function renderResults(results, stats) {
       <img width="100%" height="100%"
       src="${
         candidate.name
-          ? `./image/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
-          : "./image/No.jpeg"
+          ? `./images/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
+          : "./images/No.jpeg"
       }"
       alt="${candidate.name || "Default Candidate Image"}" />
         </span>

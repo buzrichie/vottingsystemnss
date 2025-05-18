@@ -7,7 +7,6 @@ import {
   setToken,
 } from "./js/services/tokenManager.js";
 import { capitalizeWords } from "./js/utils/capitaliseWord.js";
-import { navigateTo } from "./js/utils/router.js";
 import {
   getResult,
   getStats,
@@ -17,6 +16,7 @@ import {
 import { adminShowResult } from "./js/utils/adminShowResult.js";
 import { toggleSpinner } from "./js/services/toggleSpinner.js";
 import { submitVotes } from "./js/services/submitVotes.js";
+import { fetchAllImageFiles } from "./js/services/fetchAllImages.js";
 
 (async function () {
   const data = await fetchConfig();
@@ -86,6 +86,7 @@ import { submitVotes } from "./js/services/submitVotes.js";
       currentPage = 0;
       votes = {};
 
+      fetchAllImageFiles();
       showVotingPage();
     } catch (err) {
       loginMessage.textContent = err.message;
@@ -125,8 +126,8 @@ import { submitVotes } from "./js/services/submitVotes.js";
 
       const img = document.createElement("img");
       img.src = candidate.name
-        ? `./image/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
-        : "./image/No.jpeg";
+        ? `./images/${capitalizeWords(candidate.name.split(" ")[0])}.jpeg`
+        : "./images/No.jpeg";
 
       img.alt = candidate.name;
 
@@ -158,7 +159,7 @@ import { submitVotes } from "./js/services/submitVotes.js";
       noneBox.className = "candidate";
 
       const noneImg = document.createElement("img");
-      noneImg.src = "./image/No.jpeg";
+      noneImg.src = "./images/No.jpeg";
       noneImg.alt = "None of the Above";
 
       const noneInfoBox = document.createElement("div");
@@ -267,14 +268,14 @@ import { submitVotes } from "./js/services/submitVotes.js";
 
       const votingEndTime = new Date("2025-04-30T16:00:00.000Z");
       const clientLoadTime = Date.now();
-      const now = new Date(
+      const currentTime = new Date(
         serverTime.getTime() + (Date.now() - clientLoadTime)
       );
-      if (now < votingEndTime && !getAdminToken()) {
+      if (currentTime < votingEndTime && !getAdminToken()) {
         throw new Error("Election has not ended. Please check back later.");
       }
 
-      if (now < votingEndTime && !getResult()) {
+      if (currentTime > votingEndTime && !getResult()) {
         const res = await fetch(`${baseUri}/admin/public-results`, {
           method: "GET",
           credentials: "include",
@@ -312,5 +313,10 @@ import { submitVotes } from "./js/services/submitVotes.js";
   function closeAdminPanel() {
     adminPanel.style.display = "none";
     loginPage.style.display = "block";
+    if (getAdminToken()) {
+      document.getElementById("admin-access").style.display = "block";
+    } else {
+      document.getElementById("admin-access").style.display = "none";
+    }
   }
 })();

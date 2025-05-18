@@ -6,6 +6,7 @@ const path = require("node:path");
 const cors = require("cors");
 const crypto = require("crypto");
 const fs = require("fs");
+const getAllImageFiles = require("./utils/getAllImageFiles");
 
 const app = express();
 
@@ -44,8 +45,8 @@ app.use(
 
 // Rate Limiter
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
-  max: 100,
+  windowMs: 15 * 60 * 1000,
+  max: 200,
   message: "Too many requests, please try again later.",
 });
 app.use(limiter);
@@ -53,7 +54,6 @@ app.use(limiter);
 // Middleware to prevent directory traversal attacks
 // app.use('/socket.io-client', express.static(path.join(__dirname, 'node_modules/socket.io-client/socket.io.min.js')));
 // Serve static files like images, styles
-app.use(express.static(path.join(__dirname, "public")));
 app.use((req, res, next) => {
   const requestedPath = path.resolve(path.join(__dirname, "public", req.url));
   if (!requestedPath.startsWith(path.join(__dirname, "public"))) {
@@ -61,11 +61,19 @@ app.use((req, res, next) => {
   }
   next();
 });
+app.use(express.static(path.join(__dirname, "public")));
 
 // Serve frontend with nonce replacement
 app.get("/config", (req, res) => {
   // Send the baseUri and any other settings you want to expose
   res.json({ baseUri: baseURL });
+});
+
+app.get("/assets-list", (req, res) => {
+  // res.set("Cache-Control", "public, max-age=1800");
+  const assetPath = path.join(__dirname, "public/images");
+  const files = getAllImageFiles(assetPath);
+  res.json(files); // returns something like ["person1.jpg", "candidates/john.png"]
 });
 
 app.get("/", (req, res) => {

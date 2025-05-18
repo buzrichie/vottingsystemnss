@@ -1,5 +1,6 @@
 import { renderResults } from "../renderVoteResult.js";
 import { fetchConfig, getBaseUri } from "../services/config.js";
+import { fetchAllImageFiles } from "../services/fetchAllImages.js";
 import { toggleSpinner } from "../services/toggleSpinner.js";
 import { getAdminToken, setAdminToken } from "../services/tokenManager.js";
 import {
@@ -41,6 +42,7 @@ export async function adminShowResult() {
       setAdminToken(data.csrfToken);
       setResult(data.results.results);
       setStats(data.results.stats);
+      fetchAllImageFiles();
     }
 
     const results = getResult();
