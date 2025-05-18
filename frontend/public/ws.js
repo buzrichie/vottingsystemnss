@@ -1,15 +1,15 @@
-import { fetchConfig, getBaseUri } from "./config.js";
+import { fetchConfig, getBaseUri } from "./js/services/config.js";
 
 import { renderResults } from "./js/renderVoteResult.js";
 
-import { getAdminToken } from "./js/tokenManager.js";
+import { getAdminToken } from "./js/services/tokenManager.js";
 
 import {
   getResult,
   getStats,
   setResult,
   setStats,
-} from "./voteStats-Resultt.js";
+} from "./js/services/vote_stats_n_results.js";
 
 (async () => {
   // const data = await fetchConfig();
