@@ -1,0 +1,189 @@
+#admin-panel {
+  background-color: #f5f7fa;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+  max-width: 1000px;
+  margin: 2rem auto;
+  position: relative;
+}
+
+#admin-panel h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.stats-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  flex: 1 1 200px;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.stat-card h3, .stat-card p { color: #ffffff; }
+.stat-card-1 { background-color: #f39c12; }
+.stat-card-2 { background-color: #2ebf2e; }
+.stat-card-3 { background-color: #3498db; }
+
+#results-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+.result-section {
+  background: #ffffff;
+  border: 1px solid #dfe6e9;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.result-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+.result-section h2 {
+  margin-top: 0;
+  color: #2ebf2e;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #2ebf2e;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.candidate-box {
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed #dfe6e9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s;
+  border-radius: 6px;
+}
+.candidate-box:last-of-type { border-bottom: none; }
+.candidate-box.winner {
+  background-color: #f0fff0;
+  padding: 0.6rem 0.5rem;
+}
+
+.candidate-s {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  flex: 1;
+}
+.candidate-s p { margin: 0; font-size: 0.95rem; }
+.vote-count { font-size: 0.85rem; color: #7f8d88; }
+.rank { font-size: 1.1rem; }
+
+.candidate-img {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border: 2px solid #2ebf2e;
+  flex-shrink: 0;
+}
+.candidate-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.votes-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  font-weight: bold;
+  color: #2c3e50;
+  font-size: 0.85rem;
+}
+
+#close-admin-btn {
+  display: block;
+  margin: 2rem auto 0;
+  background-color: #e74c3c;
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#close-admin-btn:hover { background-color: #c0392b; }
+
+.admin-login-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+.admin-login-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.admin-login-card h2 { color: #2c3e50; margin-bottom: 0.5rem; }
+.admin-login-card p { color: #7f8d88; margin-bottom: 1.5rem; }
+.admin-login-card input {
+  width: 85%;
+  padding: 10px;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s;
+}
+.admin-login-card input:focus { border-color: #2ebf2e; }
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+.modal-actions button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #0f8f0f;
+  color: #ffffff;
+  transition: background-color 0.3s;
+}
+.modal-actions button:hover:not(:disabled) { background-color: #15c015; }
+.modal-actions button:disabled { opacity: 0.7; }
+.btn-cancel { background-color: #e74c3c !important; }
+.btn-cancel:hover:not(:disabled) { background-color: #c0392b !important; }
+
+.error-msg { color: #e74c3c; font-weight: bold; font-size: 0.9rem; }
+
+.spinner-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+@media screen and (max-width: 524px) {
+  #admin-panel { padding: 0 20px; }
+}

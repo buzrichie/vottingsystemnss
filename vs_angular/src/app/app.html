@@ -1,0 +1,22 @@
+<div class="main-wrapper">
+  <app-login
+    *ngIf="view === 'login'"
+    (loggedIn)="onLoggedIn($event)"
+    (showAdmin)="onShowAdmin()"
+  ></app-login>
+
+  <app-voting
+    *ngIf="view === 'voting'"
+    [votingData]="votingData"
+    (voteSubmitted)="onVoteSubmitted()"
+  ></app-voting>
+
+  <app-thank-you
+    *ngIf="view === 'thank-you'"
+  ></app-thank-you>
+
+  <app-admin-panel
+    *ngIf="view === 'admin'"
+    (closed)="onAdminClosed()"
+  ></app-admin-panel>
+</div>

@@ -1,0 +1,93 @@
+#login-page {
+  background-color: #ffffff;
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 20px 10px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  position: relative;
+}
+
+.nss-logo-wrapper {
+  max-width: 200px;
+  display: inline-block;
+}
+
+.p-heading {
+  margin-top: 0;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #2ebf2e;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+.p-heading .ph-red { color: #e74c3c; }
+.p-heading .ph-yellow { color: #f39c12; }
+.p-heading .ph-green { color: #2ebf2e; }
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input[type="text"],
+input[type="password"] {
+  padding: 10px;
+  width: 80%;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #2ebf2e;
+}
+
+button {
+  background-color: #0f8f0f;
+  color: #ffffff;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+button:hover:not(:disabled) { background-color: #15c015; }
+button:disabled { opacity: 0.7; cursor: not-allowed; }
+
+#login-message {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #e74c3c;
+}
+
+#admin-access {
+  text-align: center;
+  margin-top: 20px;
+}
+#admin-access-btn {
+  background-color: #f39c12;
+}
+#admin-access-btn:hover:not(:disabled) {
+  background-color: #e67e22;
+}
+
+.spinner-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+@media screen and (max-width: 524px) {
+  #login-page { margin-top: 0; }
+}

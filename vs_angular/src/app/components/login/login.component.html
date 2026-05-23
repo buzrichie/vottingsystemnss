@@ -1,0 +1,52 @@
+<div id="login-page">
+  <span class="nss-logo-wrapper">
+    <img width="100%" src="/images/NSS-Logo.png" alt="NSS Logo" />
+  </span>
+  <div class="p-heading">
+    <span class="ph-red">N</span><span class="ph-yellow">S</span><span class="ph-green">S</span>
+    ELECTION AWUTU SENYA EAST
+  </div>
+
+  <app-countdown (electionEnded)="onElectionEnded()"></app-countdown>
+
+  <form id="login-form" (ngSubmit)="onSubmit()">
+    <input
+      type="text"
+      id="nss-number"
+      autocomplete="name"
+      placeholder="Enter NSS Number"
+      [(ngModel)]="nssNumber"
+      name="nssNumber"
+    />
+    <input
+      type="password"
+      id="password"
+      autocomplete="current-password"
+      placeholder="Enter Password"
+      [(ngModel)]="password"
+      name="password"
+    />
+    <button id="login-btn" type="submit" [disabled]="loading" [style.display]="electionEnded ? 'none' : ''">
+      {{ loading ? 'Loading...' : 'Proceed To Vote' }}
+    </button>
+  </form>
+
+  <p id="login-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div id="admin-access" *ngIf="electionEnded">
+    <button id="admin-access-btn" (click)="onViewResults()" [disabled]="loading">
+      {{ loading ? 'Loading...' : 'View Results' }}
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="spinner-overlay">
+    <div class="spinner-inner">
+      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="#007bff" stroke-width="5" fill="none">
+          <animate attributeName="stroke-dasharray" dur="2s" repeatCount="indefinite" values="1 150; 80 15; 1 150" />
+          <animate attributeName="stroke-dashoffset" dur="2s" repeatCount="indefinite" values="0; -40; -120" />
+        </circle>
+      </svg>
+    </div>
+  </div>
+</div>
